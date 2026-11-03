@@ -1,3 +1,3 @@
 class ApiConstants {
-  static const String baseUrl = "https://dentify-g0daf5g9gwasgtdg.centralus-01.azurewebsites.net/api/";
+  static const String baseUrl = "https://backend-repository-8k4q.onrender.com/api/";
 }
