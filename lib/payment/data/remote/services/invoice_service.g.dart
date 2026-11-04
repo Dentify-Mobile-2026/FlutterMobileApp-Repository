@@ -12,7 +12,6 @@ class _InvoiceService implements InvoiceService {
   _InvoiceService(
     this._dio, {
     this.baseUrl,
-    this.errorLogger,
   }) {
     baseUrl ??=
         'https://dentify-g0daf5g9gwasgtdg.centralus-01.azurewebsites.net/api/';
@@ -21,8 +20,6 @@ class _InvoiceService implements InvoiceService {
   final Dio _dio;
 
   String? baseUrl;
-
-  final ParseErrorLogger? errorLogger;
 
   @override
   Future<List<InvoiceResponse>> getAllInvoices() async {
@@ -47,17 +44,10 @@ class _InvoiceService implements InvoiceService {
           baseUrl,
         )));
     final _result = await _dio.fetch<List<dynamic>>(_options);
-    late List<InvoiceResponse> _value;
-    try {
-      _value = _result.data!
-          .map((dynamic i) =>
-              InvoiceResponse.fromJson(i as Map<String, dynamic>))
-          .toList();
-    } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options);
-      rethrow;
-    }
-    return _value;
+    return _result.data!
+      .map((dynamic i) =>
+        InvoiceResponse.fromJson(i as Map<String, dynamic>))
+      .toList();
   }
 
   @override
@@ -109,17 +99,10 @@ class _InvoiceService implements InvoiceService {
           baseUrl,
         )));
     final _result = await _dio.fetch<List<dynamic>>(_options);
-    late List<InvoiceResponse> _value;
-    try {
-      _value = _result.data!
-          .map((dynamic i) =>
-              InvoiceResponse.fromJson(i as Map<String, dynamic>))
-          .toList();
-    } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options);
-      rethrow;
-    }
-    return _value;
+    return _result.data!
+      .map((dynamic i) =>
+        InvoiceResponse.fromJson(i as Map<String, dynamic>))
+      .toList();
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

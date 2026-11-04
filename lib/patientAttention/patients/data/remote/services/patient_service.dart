@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/iam/data/storage/token_storage.dart';
+import 'package:dentify_flutter/core/network/api_constants.dart';
 import 'package:dentify_flutter/patientAttention/patients/data/model/patient_response.dart';
 import 'package:dentify_flutter/patientAttention/patients/data/remote/dto/add_patient_request.dart';
 import 'package:dentify_flutter/patientAttention/patients/data/remote/dto/update_patient_request.dart';
@@ -13,14 +14,14 @@ class PatientService {
   Future<List<PatientResponse>> getAllPatients() async {
     final token = await TokenStorage.getAccessToken();
 
-    final response = await http.get(Uri.parse('$baseUrl/v1/patients'),
-    headers: {
-      'Content-Type': 'application/json',
-      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
-      }
+    final response = await http.get(
+      ApiConstants.endpoint(baseUrl, 'v1/patients'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+      },
     );
 
-    
     if (response.statusCode == 200) {
       print("BODY: ${response.body}");
       final List<dynamic> jsonResponse = json.decode(response.body);
@@ -34,13 +35,11 @@ class PatientService {
     }
   }
 
-
-
   Future<void> createPatient(AddPatientRequest request) async {
     final token = await TokenStorage.getAccessToken();
 
     final response = await http.post(
-      Uri.parse('$baseUrl/v1/patients'),
+      ApiConstants.endpoint(baseUrl, 'v1/patients'),
       headers: {
         'Content-Type': 'application/json',
         if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
@@ -53,13 +52,11 @@ class PatientService {
     }
   }
 
-
-
   Future<void> deletePatient(int id) async {
     final token = await TokenStorage.getAccessToken();
 
     final response = await http.delete(
-      Uri.parse('$baseUrl/v1/patients/$id'),
+      ApiConstants.endpoint(baseUrl, 'v1/patients/$id'),
       headers: {
         'Content-Type': 'application/json',
         if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
@@ -71,12 +68,11 @@ class PatientService {
     }
   }
 
-
   Future<void> updatePatient(int id, UpdatePatientRequest request) async {
     final token = await TokenStorage.getAccessToken();
 
     final response = await http.put(
-      Uri.parse('$baseUrl/v1/patients/$id'),
+      ApiConstants.endpoint(baseUrl, 'v1/patients/$id'),
       headers: {
         'Content-Type': 'application/json',
         if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',

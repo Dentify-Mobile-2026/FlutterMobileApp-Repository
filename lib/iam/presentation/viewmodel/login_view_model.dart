@@ -17,15 +17,12 @@ class LoginViewModel extends StateNotifier<Login?> {
 
   // Función de login que usa username y password
   Future<void> login() async {
+    errorMessage = null;
     try {
-      final result = await loginUseCase(username, password);  // Usando las propiedades
-      state = result;
-      errorMessage = null;
+      final result = await loginUseCase(username, password);
 
-      // GUARDA los tokens después del login
       await TokenStorage.saveTokens(result.accessToken, result.refreshToken);
-      // Actualiza el estado de la vista
-      print('Login successful: ${result.accessToken}');
+      state = result;
     } catch (e) {
       errorMessage = e.toString();
     }

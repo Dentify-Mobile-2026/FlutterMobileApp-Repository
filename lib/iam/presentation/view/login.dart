@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../viewmodel/login_view_model.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   final LoginViewModel viewModel;
   final VoidCallback onLogin;
   final VoidCallback toRegister;
@@ -12,6 +12,13 @@ class LoginPage extends StatelessWidget {
     required this.onLogin,
     required this.toRegister,
   });
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +33,10 @@ class LoginPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Logo
-              Image.asset('assets/images/ic_launcher-playstore.png', height: 120),
+              Image.asset(
+                'assets/images/ic_launcher-playstore.png',
+                height: 120,
+              ),
               const SizedBox(height: 32),
 
               // Card
@@ -51,7 +61,7 @@ class LoginPage extends StatelessWidget {
 
                       // Username
                       TextField(
-                        onChanged: (value) => viewModel.username = value,
+                        onChanged: (value) => widget.viewModel.username = value,
                         decoration: InputDecoration(
                           labelText: 'Username',
                           filled: true,
@@ -66,7 +76,7 @@ class LoginPage extends StatelessWidget {
                       // Password
                       TextField(
                         obscureText: true,
-                        onChanged: (value) => viewModel.password = value,
+                        onChanged: (value) => widget.viewModel.password = value,
                         decoration: InputDecoration(
                           labelText: 'Password',
                           filled: true,
@@ -79,11 +89,11 @@ class LoginPage extends StatelessWidget {
                       const SizedBox(height: 16),
 
                       // Error
-                      if (viewModel.errorMessage != null)
+                      if (widget.viewModel.errorMessage != null)
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            viewModel.errorMessage!,
+                            widget.viewModel.errorMessage!,
                             style: const TextStyle(
                               color: Color(0xFFD32F2F),
                               fontSize: 12,
@@ -97,12 +107,18 @@ class LoginPage extends StatelessWidget {
                         width: double.infinity,
                         height: 48,
                         child: ElevatedButton(
-                          onPressed: () async {
-                            await viewModel.login();
-                            if (viewModel.isAuthenticated) {
-                              onLogin();
-                            }
-                          },
+                          onPressed:
+                              _isLoading
+                                  ? null
+                                  : () async {
+                                    setState(() => _isLoading = true);
+                                    await widget.viewModel.login();
+                                    if (!mounted) return;
+                                    setState(() => _isLoading = false);
+                                    if (widget.viewModel.isAuthenticated) {
+                                      widget.onLogin();
+                                    }
+                                  },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF0288D1),
                             foregroundColor: Colors.white,
@@ -110,17 +126,29 @@ class LoginPage extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: const Text(
-                            'Login',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
+                          child:
+                              _isLoading
+                                  ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                  : const Text(
+                                    'Login',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                         ),
                       ),
                       const SizedBox(height: 16),
 
                       // Register link
                       GestureDetector(
-                        onTap: toRegister,
+                        onTap: widget.toRegister,
                         child: Text(
                           '¿No tienes cuenta? Regístrate aquí',
                           style: theme.textTheme.bodyMedium?.copyWith(

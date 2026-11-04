@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dentify_flutter/core/network/api_constants.dart';
 import 'package:dentify_flutter/iam/data/storage/token_storage.dart';
 import 'package:dentify_flutter/inventory/data/model/item_response.dart';
 import 'package:dentify_flutter/inventory/data/remote/dto/item_request.dart';
@@ -12,11 +13,12 @@ class ItemService {
   Future<List<ItemResponse>> getAllItems() async {
     final token = await TokenStorage.getAccessToken();
 
-    final response = await http.get(Uri.parse('$baseUrl/v1/items'),
-    headers : {
-      'Content-Type': 'application/json',
-      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
-      }
+    final response = await http.get(
+      ApiConstants.endpoint(baseUrl, 'v1/items'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+      },
     );
 
     if (response.statusCode == 200) {
@@ -34,7 +36,7 @@ class ItemService {
     final token = await TokenStorage.getAccessToken();
 
     final response = await http.delete(
-      Uri.parse('$baseUrl/v1/items/$id'),
+      ApiConstants.endpoint(baseUrl, 'v1/items/$id'),
       headers: {
         'Content-Type': 'application/json',
         if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
@@ -50,7 +52,7 @@ class ItemService {
     final token = await TokenStorage.getAccessToken();
 
     final response = await http.post(
-      Uri.parse('$baseUrl/v1/items'),
+      ApiConstants.endpoint(baseUrl, 'v1/items'),
       headers: {
         'Content-Type': 'application/json',
         if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
@@ -73,7 +75,7 @@ class ItemService {
     final token = await TokenStorage.getAccessToken();
 
     final response = await http.put(
-      Uri.parse('$baseUrl/v1/items/$id'),
+      ApiConstants.endpoint(baseUrl, 'v1/items/$id'),
       headers: {
         'Content-Type': 'application/json',
         if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',

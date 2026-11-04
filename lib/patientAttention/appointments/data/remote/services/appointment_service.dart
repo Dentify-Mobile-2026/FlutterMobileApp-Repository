@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/iam/data/storage/token_storage.dart';
+import 'package:dentify_flutter/core/network/api_constants.dart';
 import 'package:dentify_flutter/patientAttention/appointments/data/model/appointment_response.dart';
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/add_appointment_request.dart';
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/update_appointment_request.dart';
@@ -14,11 +15,12 @@ class AppointmentService {
   Future<AppointmentResponse> getAppointmentById(int id) async {
     final token = await TokenStorage.getAccessToken();
 
-    final response = await http.get(Uri.parse('$baseUrl/v1/appointments/appointment/$id'),
-    headers: {
-      'Content-Type': 'application/json',
-      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
-      }
+    final response = await http.get(
+      ApiConstants.endpoint(baseUrl, 'v1/appointments/appointment/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+      },
     );
 
     if (response.statusCode == 200) {
@@ -28,19 +30,17 @@ class AppointmentService {
     }
   }
 
-
-
   Future<List<AppointmentResponse>> getAllAppointments() async {
     final token = await TokenStorage.getAccessToken();
 
-    final response = await http.get(Uri.parse('$baseUrl/v1/appointments'),
-    headers: {
-      'Content-Type': 'application/json',
-      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
-      }
+    final response = await http.get(
+      ApiConstants.endpoint(baseUrl, 'v1/appointments'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+      },
     );
 
-    
     if (response.statusCode == 200) {
       print("BODY: ${response.body}");
       final List<dynamic> jsonResponse = json.decode(response.body);
@@ -58,7 +58,7 @@ class AppointmentService {
     final token = await TokenStorage.getAccessToken();
 
     final response = await http.post(
-      Uri.parse('$baseUrl/v1/appointments'),
+      ApiConstants.endpoint(baseUrl, 'v1/appointments'),
       headers: {
         'Content-Type': 'application/json',
         if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
@@ -71,11 +71,14 @@ class AppointmentService {
     }
   }
 
-  Future<void> updateAppointment(int id, UpdateAppointmentRequest request) async {
+  Future<void> updateAppointment(
+    int id,
+    UpdateAppointmentRequest request,
+  ) async {
     final token = await TokenStorage.getAccessToken();
 
     final response = await http.put(
-      Uri.parse('$baseUrl/v1/appointments/$id'),
+      ApiConstants.endpoint(baseUrl, 'v1/appointments/$id'),
       headers: {
         'Content-Type': 'application/json',
         if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
@@ -92,7 +95,7 @@ class AppointmentService {
     final token = await TokenStorage.getAccessToken();
 
     final response = await http.delete(
-      Uri.parse('$baseUrl/v1/appointments/$id'),
+      ApiConstants.endpoint(baseUrl, 'v1/appointments/$id'),
       headers: {
         'Content-Type': 'application/json',
         if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
@@ -107,11 +110,12 @@ class AppointmentService {
   Future<List<PatientDataForm>> getPatients() async {
     final token = await TokenStorage.getAccessToken();
 
-    final response = await http.get(Uri.parse('$baseUrl/v1/patients'),
-    headers: {
-      'Content-Type': 'application/json',
-      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
-      }
+    final response = await http.get(
+      ApiConstants.endpoint(baseUrl, 'v1/patients'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+      },
     );
 
     if (response.statusCode == 200) {
@@ -123,5 +127,4 @@ class AppointmentService {
       throw Exception('Failed to load patients');
     }
   }
-
 }
