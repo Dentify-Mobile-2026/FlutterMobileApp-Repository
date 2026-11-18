@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "430716301992",
+    "project_id": "dentify-2026-8c30b",
+    "storage_bucket": "dentify-2026-8c30b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:430716301992:android:815cb81d8c63fca63f489d",
+        "android_client_info": {
+          "package_name": "upc.edu.pe.dentify_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOHdRajqiq5GKazoSA8Ep9L5IP1ya3jmU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
