@@ -32,7 +32,6 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Profile'),
-        backgroundColor: const Color.fromARGB(255, 204, 224, 245),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),

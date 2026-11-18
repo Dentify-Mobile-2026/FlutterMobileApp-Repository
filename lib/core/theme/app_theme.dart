@@ -40,12 +40,13 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.background,
       textTheme: base.textTheme.apply(bodyColor: AppColors.ink, displayColor: AppColors.ink),
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.ink,
+        backgroundColor: AppColors.background,
+        foregroundColor: AppColors.primary,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
-        scrolledUnderElevation: 1,
+        scrolledUnderElevation: 0,
         centerTitle: false,
-        titleTextStyle: TextStyle(color: AppColors.ink, fontSize: 20, fontWeight: FontWeight.w700),
+        titleTextStyle: TextStyle(color: AppColors.primary, fontSize: 20, fontWeight: FontWeight.w700),
       ),
       cardTheme: CardThemeData(
         color: AppColors.surface,
