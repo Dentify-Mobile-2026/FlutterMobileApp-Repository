@@ -227,7 +227,7 @@ class _AppointmentsViewState extends ConsumerState<AppointmentsView>
                                     print('Updating appointment with ID: $id');
                                     print('With data: ${update.toJson()}');
 
-                                    await ref
+                                    final error = await ref
                                         .read(
                                           appointmentsViewModelProvider
                                               .notifier,
@@ -238,8 +238,10 @@ class _AppointmentsViewState extends ConsumerState<AppointmentsView>
                                       ScaffoldMessenger.of(
                                         context,
                                       ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text("Appointment updated"),
+                                        SnackBar(
+                                          content: Text(
+                                            error ?? "Appointment updated",
+                                          ),
                                         ),
                                       );
                                     }
@@ -332,9 +334,14 @@ class _AppointmentsViewState extends ConsumerState<AppointmentsView>
                 builder: (context) => const AddAppointmentForm(),
               );
               if (newAppointment != null) {
-                await ref
+                final error = await ref
                     .read(appointmentsViewModelProvider.notifier)
                     .addAppointment(newAppointment);
+                if (error != null && context.mounted) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(error)));
+                }
               }
             },
             icon: const Icon(Icons.add),

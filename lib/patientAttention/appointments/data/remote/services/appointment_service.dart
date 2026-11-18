@@ -3,6 +3,7 @@ import 'package:dentify_flutter/core/network/api_constants.dart';
 import 'package:dentify_flutter/patientAttention/appointments/data/model/appointment_response.dart';
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/add_appointment_request.dart';
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/update_appointment_request.dart';
+import 'package:dentify_flutter/patientAttention/appointments/domain/model/appointment_conflict_exception.dart';
 import 'package:dentify_flutter/patientAttention/appointments/domain/model/patient_data_form.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -66,6 +67,9 @@ class AppointmentService {
       body: json.encode(request.toJson()),
     );
 
+    if (response.statusCode == 409) {
+      throw const AppointmentConflictException();
+    }
     if (response.statusCode != 201) {
       throw Exception('Failed to create appointment');
     }
@@ -86,6 +90,9 @@ class AppointmentService {
       body: json.encode(request.toJson()),
     );
 
+    if (response.statusCode == 409) {
+      throw const AppointmentConflictException();
+    }
     if (response.statusCode != 200) {
       throw Exception('Failed to update appointment');
     }

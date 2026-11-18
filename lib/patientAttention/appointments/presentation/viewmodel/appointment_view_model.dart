@@ -1,6 +1,7 @@
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/add_appointment_request.dart';
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/update_appointment_request.dart';
 import 'package:dentify_flutter/patientAttention/appointments/domain/model/appointment.dart';
+import 'package:dentify_flutter/patientAttention/appointments/domain/model/appointment_conflict_exception.dart';
 import 'package:dentify_flutter/patientAttention/appointments/domain/usecases/add_appointment_use_case.dart';
 import 'package:dentify_flutter/patientAttention/appointments/domain/usecases/delete_appointment_use_case.dart';
 import 'package:dentify_flutter/patientAttention/appointments/domain/usecases/get_all_appointments_use_case.dart';
@@ -42,22 +43,31 @@ class AppointmentViewModel extends StateNotifier<List<Appointment>> {
     }
   }
 
-  Future<void> addAppointment(AddAppointmentRequest newAppointment) async {
-    // Llamar usecase correspondiente
+  /// Devuelve null si se guardó; si no, el mensaje que debe ver el usuario.
+  Future<String?> addAppointment(AddAppointmentRequest newAppointment) async {
     try {
       await addAppointmentUseCase(newAppointment);
       await getAllAppointments(); // recargar
+      return null;
+    } on AppointmentConflictException catch (e) {
+      return e.message;
     } catch (e) {
       errorMessage = e.toString();
+      return 'Could not save the appointment. Please try again.';
     }
   }
 
-  Future<void> updateAppointment(int id, UpdateAppointmentRequest appointment) async {
+  /// Devuelve null si se guardó; si no, el mensaje que debe ver el usuario.
+  Future<String?> updateAppointment(int id, UpdateAppointmentRequest appointment) async {
     try {
       await updateAppointmentUseCase(id, appointment);
       await getAllAppointments();
+      return null;
+    } on AppointmentConflictException catch (e) {
+      return e.message;
     } catch (e) {
       errorMessage = e.toString();
+      return 'Could not update the appointment. Please try again.';
     }
   }
 
