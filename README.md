@@ -15,4 +15,4 @@ flutter analyze
 
 La URL del backend está en `lib/core/network/api_constants.dart`.
 
-Ver `NOTICE.md` para el origen del proyecto y los créditos.
+
