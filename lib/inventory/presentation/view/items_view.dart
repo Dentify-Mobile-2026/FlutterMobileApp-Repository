@@ -11,8 +11,7 @@ class ItemsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final items = ref.watch(itemsViewModelProvider);
-    final itemsNotifier = ref.read(itemsViewModelProvider.notifier);
-    final isLoading = items.isEmpty && itemsNotifier.errorMessage == null;
+    final isLoading = ref.watch(itemsViewModelProvider.notifier).isLoading;
 
     return Scaffold(
       backgroundColor: AppColors.background, // Fondo general

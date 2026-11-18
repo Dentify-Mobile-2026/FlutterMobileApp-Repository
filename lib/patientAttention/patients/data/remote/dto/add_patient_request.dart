@@ -1,5 +1,5 @@
 class AddPatientRequest {
-  final int dni;
+  final String dni;
   final String firstName;
   final String lastName;
   final String email;
@@ -12,7 +12,7 @@ class AddPatientRequest {
     required this.lastName,
     required this.email,
     required this.homeAddress,
-    required this.birthday
+    required this.birthday,
   });
 
   Map<String, dynamic> toJson() {
@@ -22,7 +22,7 @@ class AddPatientRequest {
       'lastName': lastName,
       'email': email,
       'homeAddress': homeAddress,
-      'birthday': birthday
+      'birthday': birthday,
     };
   }
 }

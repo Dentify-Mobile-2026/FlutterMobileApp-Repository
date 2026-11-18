@@ -12,6 +12,7 @@ class ItemViewModel extends StateNotifier<List<Item>> {
   final AddItemUseCase addItemUseCase;
   final UpdateItemUseCase updateItemUseCase;
   String? errorMessage;
+  bool isLoading = true;
 
   ItemViewModel(
     this.getAllItemsUseCase,
@@ -24,12 +25,15 @@ class ItemViewModel extends StateNotifier<List<Item>> {
 
   Future<void> getAllItems() async {
     try {
+      isLoading = true;
       final items = await getAllItemsUseCase();
       state = items;
     } catch (e) {
       errorMessage = e.toString();
       state = [];
       print('Error fetching items: $errorMessage');
+    } finally {
+      isLoading = false;
     }
   }
 
@@ -46,7 +50,7 @@ class ItemViewModel extends StateNotifier<List<Item>> {
   Future<void> addItem(ItemRequest newItem) async {
     try {
       await addItemUseCase(newItem);
-      await getAllItemsUseCase();
+      await getAllItems();
     } catch (e) {
       errorMessage = e.toString();
       print('Error adding item: $errorMessage');
@@ -56,6 +60,7 @@ class ItemViewModel extends StateNotifier<List<Item>> {
   Future<void> updateItem(int id, ItemRequest newItem) async {
     try {
       await updateItemUseCase(id, newItem);
+      await getAllItems();
     } catch (e) {
       errorMessage = e.toString();
     }

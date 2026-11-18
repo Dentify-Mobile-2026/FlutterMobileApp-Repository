@@ -15,6 +15,7 @@ class DataModule {
 
   // Configurar el cliente Retrofit
   static Dio getRetrofit() {
+    _dio.interceptors.clear();
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         final token = await TokenStorage.getAccessToken();

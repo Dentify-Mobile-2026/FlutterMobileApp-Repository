@@ -25,6 +25,8 @@ class ItemService {
       print("BODY: ${response.body}");
       final List<dynamic> jsonResponse = json.decode(response.body);
       return jsonResponse.map((item) => ItemResponse.fromJson(item)).toList();
+    } else if (response.statusCode == 404) {
+      return [];
     } else {
       print("STATUS: ${response.statusCode}");
       print("BODY: ${response.body}");

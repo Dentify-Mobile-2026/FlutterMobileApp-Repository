@@ -57,8 +57,15 @@ class _PatientFormState extends ConsumerState<PatientForm> {
             children: [
               TextFormField(
                 controller: dni,
-                decoration: const InputDecoration(labelText: "DNI"),
-                validator: (v) => v == null || v.isEmpty ? "required" : null,
+                decoration: const InputDecoration(labelText: "DNI (8 digits)"),
+                maxLength: 8,
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return "required";
+                  if (!RegExp(r'^\d{8}$').hasMatch(v.trim())) {
+                    return "DNI must be exactly 8 digits";
+                  }
+                  return null;
+                },
               ),
               TextFormField(
                 controller: firstName,
@@ -127,22 +134,22 @@ class _PatientFormState extends ConsumerState<PatientForm> {
               if (widget.patient == null) {
                 // CREACIÓN
                 final request = AddPatientRequest(
-                  dni: int.parse(dni.text),
-                  firstName: firstName.text,
-                  lastName: lastName.text,
-                  email: email.text,
-                  homeAddress: homeAddress.text,
+                  dni: dni.text.trim(),
+                  firstName: firstName.text.trim(),
+                  lastName: lastName.text.trim(),
+                  email: email.text.trim(),
+                  homeAddress: homeAddress.text.trim(),
                   birthday: birthday,
                 );
                 Navigator.pop(context, request);
               } else {
                 // EDICIÓN
                 final update = UpdatePatientRequest(
-                  dni: int.parse(dni.text),
-                  firstName: firstName.text,
-                  lastName: lastName.text,
-                  email: email.text,
-                  homeAddress: homeAddress.text,
+                  dni: dni.text.trim(),
+                  firstName: firstName.text.trim(),
+                  lastName: lastName.text.trim(),
+                  email: email.text.trim(),
+                  homeAddress: homeAddress.text.trim(),
                   birthday: birthday,
                 );
                 Navigator.pop(context, {

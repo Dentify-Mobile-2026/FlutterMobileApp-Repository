@@ -68,9 +68,7 @@ class _AppointmentsViewState extends ConsumerState<AppointmentsView>
   @override
   Widget build(BuildContext context) {
     final appointments = ref.watch(appointmentsViewModelProvider);
-    final isLoading =
-        appointments.isEmpty &&
-        ref.read(appointmentsViewModelProvider.notifier).errorMessage == null;
+    final isLoading = ref.watch(appointmentsViewModelProvider.notifier).isLoading;
 
     return Scaffold(
       backgroundColor: AppColors.background,

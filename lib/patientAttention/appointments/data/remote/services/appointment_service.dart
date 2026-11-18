@@ -48,6 +48,8 @@ class AppointmentService {
       return jsonResponse
           .map((appointment) => AppointmentResponse.fromJson(appointment))
           .toList();
+    } else if (response.statusCode == 404) {
+      return [];
     } else {
       print("STATUS: ${response.statusCode}");
       print("BODY: ${response.body}");
@@ -130,6 +132,8 @@ class AppointmentService {
       return jsonResponse
           .map((patient) => PatientDataForm.fromJson(patient))
           .toList();
+    } else if (response.statusCode == 404) {
+      return [];
     } else {
       throw Exception('Failed to load patients');
     }

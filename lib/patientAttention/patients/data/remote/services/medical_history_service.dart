@@ -29,6 +29,8 @@ class MedicalHistoryService {
             (medicalHistory) => MedicalHistoryResponse.fromJson(medicalHistory),
           )
           .toList();
+    } else if (response.statusCode == 404) {
+      return [];
     } else {
       print("STATUS: ${response.statusCode}");
       print("BODY: ${response.body}");

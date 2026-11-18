@@ -1,3 +1,4 @@
+import 'package:dentify_flutter/iam/data/storage/token_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/usecases/register_use_case.dart';
 import '../../domain/model/register.dart';
@@ -32,6 +33,7 @@ class RegisterViewModel extends StateNotifier<Login?> {
         trial: trial,
       );
       final response = await registerUseCase(registerModel);
+      await TokenStorage.saveTokens(response.accessToken, response.refreshToken);
       state = response;
       errorMessage = null;
     } catch (e) {

@@ -18,6 +18,7 @@ class AppointmentViewModel extends StateNotifier<List<Appointment>> {
   final DeleteAppointmentUseCase deleteAppointmentUseCase;
   final GetAllPatientsDataFormUseCase getAllPatientsDataFormUseCase;
   String? errorMessage;
+  bool isLoading = true;
 
   AppointmentViewModel(this.getAllAppointmentsUseCase, this.getAppointmentByIdUseCase, this.addAppointmentUseCase, this.updateAppointmentUseCase, this.deleteAppointmentUseCase, this.getAllPatientsDataFormUseCase) : super([]) {
     getAllAppointments();
@@ -25,12 +26,15 @@ class AppointmentViewModel extends StateNotifier<List<Appointment>> {
 
   Future<void> getAllAppointments() async {
     try {
+      isLoading = true;
       final appointments = await getAllAppointmentsUseCase();
       state = appointments;
     } catch (e) {
       errorMessage = e.toString();
       state = []; // Reset state on error
       print('Error fetching appointments: $errorMessage');
+    } finally {
+      isLoading = false;
     }
   }
   Future<void> getAppointmentById(int id) async {

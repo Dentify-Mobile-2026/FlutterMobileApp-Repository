@@ -27,6 +27,8 @@ class _AddAppointmentFormState extends ConsumerState<AddAppointmentForm> {
   DateTime? selectedDate;
   int? selectedPatientId;
   TimeOfDay? selectedTime;
+  bool dateError = false;
+  bool timeError = false;
 
   @override
   Widget build(BuildContext context) {
@@ -153,8 +155,12 @@ class _AddAppointmentFormState extends ConsumerState<AddAppointmentForm> {
           child: Text(
             selectedDate != null
                 ? "Selected: ${selectedDate!.toLocal().toString().split(' ')[0]}"
-                : "Select date",
-            style: const TextStyle(fontSize: 14),
+                : "Select date *",
+            style: TextStyle(
+              fontSize: 14,
+              color: dateError && selectedDate == null ? Colors.red : Colors.black87,
+              fontWeight: selectedDate != null ? FontWeight.bold : FontWeight.normal,
+            ),
           ),
         ),
         IconButton(
@@ -167,7 +173,10 @@ class _AddAppointmentFormState extends ConsumerState<AddAppointmentForm> {
               lastDate: DateTime(2100),
             );
             if (picked != null) {
-              setState(() => selectedDate = picked);
+              setState(() {
+                selectedDate = picked;
+                dateError = false;
+              });
             }
           },
         ),
@@ -182,8 +191,12 @@ class _AddAppointmentFormState extends ConsumerState<AddAppointmentForm> {
           child: Text(
             selectedTime != null
                 ? "Time: ${selectedTime!.format(context)}"
-                : "Select time",
-            style: const TextStyle(fontSize: 14),
+                : "Select time *",
+            style: TextStyle(
+              fontSize: 14,
+              color: timeError && selectedTime == null ? Colors.red : Colors.black87,
+              fontWeight: selectedTime != null ? FontWeight.bold : FontWeight.normal,
+            ),
           ),
         ),
         IconButton(
@@ -194,7 +207,10 @@ class _AddAppointmentFormState extends ConsumerState<AddAppointmentForm> {
               initialTime: TimeOfDay.now(),
             );
             if (picked != null) {
-              setState(() => selectedTime = picked);
+              setState(() {
+                selectedTime = picked;
+                timeError = false;
+              });
             }
           },
         ),
@@ -221,7 +237,13 @@ class _AddAppointmentFormState extends ConsumerState<AddAppointmentForm> {
   // --- Submit ---
 
   void _submit() {
-    if (_formKey.currentState!.validate() &&
+    final isValid = _formKey.currentState!.validate();
+    setState(() {
+      dateError = selectedDate == null;
+      timeError = selectedTime == null;
+    });
+
+    if (isValid &&
         selectedDate != null &&
         selectedTime != null) {
       final localDateTime = DateTime(

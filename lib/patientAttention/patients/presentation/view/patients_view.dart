@@ -84,6 +84,24 @@ class PatientsView extends ConsumerWidget {
                 await ref
                     .read(patientsViewModelProvider.notifier)
                     .addPatient(newPatient);
+                final vm = ref.read(patientsViewModelProvider.notifier);
+                if (context.mounted) {
+                  if (vm.errorMessage != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error: ${vm.errorMessage}'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Patient added successfully!'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                }
               }
             },
             style: ElevatedButton.styleFrom(

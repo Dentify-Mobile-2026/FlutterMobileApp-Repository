@@ -48,7 +48,15 @@ class PatientService {
     );
 
     if (response.statusCode != 201) {
-      throw Exception('Failed to create patient');
+      try {
+        final Map<String, dynamic> errorBody = json.decode(response.body);
+        if (errorBody.containsKey('error')) {
+          throw Exception(errorBody['error']);
+        }
+      } catch (e) {
+        if (e is Exception && !e.toString().contains('FormatException')) rethrow;
+      }
+      throw Exception('Failed to create patient (status ${response.statusCode})');
     }
   }
 

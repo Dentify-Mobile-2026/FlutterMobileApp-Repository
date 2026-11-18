@@ -39,16 +39,23 @@ class _InvoiceViewState extends State<InvoiceView> {
     final invoices = widget.viewModel.invoices;
     return Scaffold(
       appBar: AppBar(title: Text("Invoices"),automaticallyImplyLeading: false,),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView.builder(
-          itemCount: invoices.length,
-          itemBuilder: (context, index) {
-            final invoice = invoices[index];
-            return InvoiceItemView(invoice: invoice);
-          },
-        ),
-      ),
+      body: invoices.isEmpty
+          ? const Center(
+              child: Text(
+                "No invoices found",
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+              ),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ListView.builder(
+                itemCount: invoices.length,
+                itemBuilder: (context, index) {
+                  final invoice = invoices[index];
+                  return InvoiceItemView(invoice: invoice);
+                },
+              ),
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: widget.toAddInvoiceForm,
         child: Icon(Icons.add),
