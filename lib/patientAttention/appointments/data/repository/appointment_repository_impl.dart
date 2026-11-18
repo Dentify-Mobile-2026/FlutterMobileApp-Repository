@@ -1,10 +1,11 @@
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/add_appointment_request.dart';
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/update_appointment_request.dart';
+import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/update_appointment_status_request.dart';
+import 'package:dentify_flutter/patientAttention/appointments/data/remote/services/appointment_service.dart';
 import 'package:dentify_flutter/patientAttention/appointments/domain/model/appointment.dart';
 import 'package:dentify_flutter/patientAttention/appointments/domain/repositories/appointment_repository.dart';
-import 'package:dentify_flutter/patientAttention/appointments/data/remote/services/appointment_service.dart';
 
-class AppointmentRepositoryImpl implements AppointmentRepository{
+class AppointmentRepositoryImpl implements AppointmentRepository {
   final AppointmentService appointmentService;
 
   AppointmentRepositoryImpl(this.appointmentService);
@@ -30,10 +31,15 @@ class AppointmentRepositoryImpl implements AppointmentRepository{
   Future<void> updateAppointment(int id, UpdateAppointmentRequest appointment) async {
     await appointmentService.updateAppointment(id, appointment);
   }
-  
+
+  @override
+  Future<void> updateAppointmentStatus(
+      int id, UpdateAppointmentStatusRequest request) async {
+    await appointmentService.updateAppointmentStatus(id, request);
+  }
+
   @override
   Future<void> deleteAppointment(int id) async {
     await appointmentService.deleteAppointment(id);
   }
-
 }

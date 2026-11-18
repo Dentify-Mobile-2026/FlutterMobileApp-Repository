@@ -61,9 +61,10 @@ flutter run -d <id_del_dispositivo> --dart-define=API_BASE_URL=http://10.0.2.2:8
 
 - **Login y Registro:** Permite iniciar sesión o crear una cuenta nueva de consultorio (con guardado inmediato de token para navegación fluida).
 - **Dashboard (`/home`):** Visualización de métricas de insumos con stock bajo, pagos recientes y próximas citas.
-- **Pacientes (`/patients`):** Lista y búsqueda de pacientes, creación y edición con validación de DNI de 8 dígitos, email y fecha de nacimiento.
+- **Pacientes (`/patients`):** Directorio clínico con indicadores de pacientes con alerta médica, filtro rápido *"Solo Alertas"*, registro de alergias (Penicilina, Anestesia, Látex, AINEs), condiciones sistémicas, teléfono y contacto de emergencia.
 - **Historial Médico:** Acceso desde la tarjeta de cada paciente para registrar diagnósticos, antecedentes, tratamientos y medicación.
-- **Citas (`/appointments`):** Programación y gestión de citas con selector de paciente, fecha, hora y duración en minutos, con detección de solapamiento de horarios.
+- **Catálogo de Tratamientos (`/treatments`):** Gestión de procedimientos odontológicos por especialidad (`Prevención`, `Operatoria`, `Endodoncia`, `Periodoncia`, `Ortodoncia`, `Cirugía`, `Prótesis`, `Estética`), con arancel en `S/.` y duración estimada en minutos.
+- **Citas (`/appointments`):** Agenda clínica con selección de tratamiento del catálogo (autocompletado de motivo y duración), filtros por estado (`Agendada`, `Confirmada`, `En Atención`, `Atendida`, `Cancelada`, `No Asistió`) y diálogo de evolución clínica.
 - **Inventario (`/inventory`):** Catálogo de insumos clasificados por categoría clínica con alertas de stock y control de precios.
 - **Facturación / Pagos (`/payments`):** Generación de facturas vinculadas a citas pendientes y selección de medio de pago (Efectivo, Tarjeta, Transferencia).
 - **Perfil (`/profile`):** Edición de información de la clínica y cambio de contraseña.

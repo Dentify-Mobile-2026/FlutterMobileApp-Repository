@@ -11,7 +11,6 @@ import 'package:dentify_flutter/patientAttention/patients/presentation/viewmodel
 import 'package:dentify_flutter/patientAttention/patients/presentation/viewmodel/patient_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
 final getAllPatientsUseCaseProvider = Provider<GetAllPatientsUseCase>((ref) {
   return GetAllPatientsUseCase(ref.read(patientRepositoryProvider));
 });
@@ -30,33 +29,34 @@ final updatePatientUseCaseProvider = Provider<UpdatePatientUseCase>((ref) {
 
 final patientsViewModelProvider = StateNotifierProvider<PatientViewModel, List<Patient>>((ref) {
   return PatientViewModel(
-    ref.read(getAllPatientsUseCaseProvider), 
+    ref.read(getAllPatientsUseCaseProvider),
     ref.read(addPatientUseCaseProvider),
     ref.read(deletePatientUseCaseProvider),
     ref.read(updatePatientUseCaseProvider),
-    ref
-    );
+    ref,
+  );
 });
 
-
-
-
-
 final patientSearchQueryProvider = StateProvider<String>((ref) => '');
+final patientOnlyAlertsFilterProvider = StateProvider<bool>((ref) => false);
 
 final filteredPatientsProvider = Provider<List<Patient>>((ref) {
   final patients = ref.watch(patientsViewModelProvider);
-  final query = ref.watch(patientSearchQueryProvider).toLowerCase();
+  final query = ref.watch(patientSearchQueryProvider).toLowerCase().trim();
+  final onlyAlerts = ref.watch(patientOnlyAlertsFilterProvider);
 
   return patients.where((p) {
-    return p.dni.contains(query) ||
-           p.firstName.toLowerCase().contains(query) ||
-           p.lastName.toLowerCase().contains(query);
+    if (onlyAlerts && !p.hasMedicalAlerts) return false;
+    if (query.isEmpty) return true;
+    return p.dni.toLowerCase().contains(query) ||
+        p.firstName.toLowerCase().contains(query) ||
+        p.lastName.toLowerCase().contains(query) ||
+        p.fullName.toLowerCase().contains(query) ||
+        p.phone.toLowerCase().contains(query) ||
+        p.allergies.toLowerCase().contains(query) ||
+        p.systemicConditions.toLowerCase().contains(query);
   }).toList();
 });
-
-
-
 
 final getAllMedicalHistoriesUseCaseProvider = Provider<GetAllMedicalHistoriesUseCase>((ref) {
   return GetAllMedicalHistoriesUseCase(ref.read(medicalHistoryRepositoryProvider));
@@ -67,16 +67,14 @@ final addMedicalHistoryUseCaseProvider = Provider<AddMedicalHistoryUseCase>((ref
 });
 
 final medicalHistoriesViewModelProvider = StateNotifierProvider.family<
-  MedicalHistoryViewModel,
-  List<MedicalHistory>,
-  int 
->((ref, id) {
+    MedicalHistoryViewModel,
+    List<MedicalHistory>,
+    int>((ref, id) {
   return MedicalHistoryViewModel(
     ref.read(getAllMedicalHistoriesUseCaseProvider),
     ref.read(addMedicalHistoryUseCaseProvider),
     id,
   );
 });
-
 
 final isLoadingProvider = StateProvider<bool>((ref) => true);

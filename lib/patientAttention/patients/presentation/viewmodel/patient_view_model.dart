@@ -28,13 +28,13 @@ class PatientViewModel extends StateNotifier<List<Patient>> {
 
   Future<void> getAllPatients() async {
     try {
+      errorMessage = null;
       ref.read(isLoadingProvider.notifier).state = true;
       final patients = await getAllPatientsUseCase();
       state = patients;
     } catch (e) {
       errorMessage = e.toString();
       state = [];
-      print('Error fetching patients: $errorMessage');
     } finally {
       ref.read(isLoadingProvider.notifier).state = false;
     }
@@ -42,8 +42,9 @@ class PatientViewModel extends StateNotifier<List<Patient>> {
 
   Future<void> addPatient(AddPatientRequest newPatient) async {
     try {
+      errorMessage = null;
       await addPatientUseCase(newPatient);
-      await getAllPatients(); // recargar
+      await getAllPatients();
     } catch (e) {
       errorMessage = e.toString();
     }
@@ -51,6 +52,7 @@ class PatientViewModel extends StateNotifier<List<Patient>> {
 
   Future<void> deletePatient(int id) async {
     try {
+      errorMessage = null;
       await deletePatientUseCase(id);
       await getAllPatients();
     } catch (e) {
@@ -60,6 +62,7 @@ class PatientViewModel extends StateNotifier<List<Patient>> {
 
   Future<void> updatePatient(int id, UpdatePatientRequest patient) async {
     try {
+      errorMessage = null;
       await updatePatientUseCase(id, patient);
       await getAllPatients();
     } catch (e) {
@@ -69,6 +72,7 @@ class PatientViewModel extends StateNotifier<List<Patient>> {
 
   Future<bool> deletePatientAndRefresh(int id) async {
     try {
+      errorMessage = null;
       ref.read(isLoadingProvider.notifier).state = true;
       await deletePatientUseCase(id);
       await getAllPatients();

@@ -14,8 +14,15 @@ class AppColors {
   static const Color ink = Color(0xFF0F172A);
   static const Color muted = Color(0xFF64748B);
   static const Color danger = Color(0xFFDC2626);
+  static const Color dangerLight = Color(0xFFFEE2E2);
   static const Color warning = Color(0xFFF59E0B);
+  static const Color warningLight = Color(0xFFFEF3C7);
   static const Color success = Color(0xFF10B981);
+  static const Color successLight = Color(0xFFD1FAE5);
+  static const Color info = Color(0xFF0284C7);
+  static const Color infoLight = Color(0xFFE0F2FE);
+  static const Color purple = Color(0xFF7C3AED);
+  static const Color purpleLight = Color(0xFFEDE9FE);
 }
 
 /// Tema Material 3 de Dentify.

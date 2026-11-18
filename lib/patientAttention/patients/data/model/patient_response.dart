@@ -8,6 +8,11 @@ class PatientResponse {
   final String email;
   final String homeAddress;
   final String birthday;
+  final String phone;
+  final String allergies;
+  final String systemicConditions;
+  final String emergencyContactName;
+  final String emergencyContactPhone;
 
   const PatientResponse({
     required this.id,
@@ -16,28 +21,45 @@ class PatientResponse {
     required this.lastName,
     required this.email,
     required this.homeAddress,
-    required this.birthday
+    required this.birthday,
+    this.phone = '',
+    this.allergies = '',
+    this.systemicConditions = '',
+    this.emergencyContactName = '',
+    this.emergencyContactPhone = '',
   });
 
   factory PatientResponse.fromJson(Map<String, dynamic> json) {
     return PatientResponse(
-      id: json['id'], 
-      dni: json['dni'], 
-      firstName: json['firstName'], 
-      lastName: json['lastName'], 
-      email: json['email'], 
-      homeAddress: json['homeAddress'], 
-      birthday: json['birthday']);
+      id: json['id'],
+      dni: (json['dni'] ?? '').toString(),
+      firstName: (json['firstName'] ?? '').toString(),
+      lastName: (json['lastName'] ?? '').toString(),
+      email: (json['email'] ?? '').toString(),
+      homeAddress: (json['homeAddress'] ?? '').toString(),
+      birthday: (json['birthday'] ?? '').toString(),
+      phone: (json['phone'] ?? '').toString(),
+      allergies: (json['allergies'] ?? '').toString(),
+      systemicConditions: (json['systemicConditions'] ?? '').toString(),
+      emergencyContactName: (json['emergencyContactName'] ?? '').toString(),
+      emergencyContactPhone: (json['emergencyContactPhone'] ?? '').toString(),
+    );
   }
 
   Patient toDomain() {
     return Patient(
-      id: id, 
-      dni: dni, 
-      firstName: firstName, 
-      lastName: lastName, 
-      email: email, 
-      homeAddress: homeAddress, 
-      birthday: birthday);
+      id: id,
+      dni: dni,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      homeAddress: homeAddress,
+      birthday: birthday,
+      phone: phone,
+      allergies: allergies,
+      systemicConditions: systemicConditions,
+      emergencyContactName: emergencyContactName,
+      emergencyContactPhone: emergencyContactPhone,
+    );
   }
 }

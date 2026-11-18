@@ -5,6 +5,11 @@ class UpdatePatientRequest {
   final String email;
   final String homeAddress;
   final String birthday;
+  final String phone;
+  final String allergies;
+  final String systemicConditions;
+  final String emergencyContactName;
+  final String emergencyContactPhone;
 
   const UpdatePatientRequest({
     required this.dni,
@@ -13,6 +18,11 @@ class UpdatePatientRequest {
     required this.email,
     required this.homeAddress,
     required this.birthday,
+    this.phone = '',
+    this.allergies = '',
+    this.systemicConditions = '',
+    this.emergencyContactName = '',
+    this.emergencyContactPhone = '',
   });
 
   Map<String, dynamic> toJson() {
@@ -23,6 +33,11 @@ class UpdatePatientRequest {
       'email': email,
       'homeAddress': homeAddress,
       'birthday': birthday,
+      'phone': phone,
+      'allergies': allergies,
+      'systemicConditions': systemicConditions,
+      'emergencyContactName': emergencyContactName,
+      'emergencyContactPhone': emergencyContactPhone,
     };
   }
 }

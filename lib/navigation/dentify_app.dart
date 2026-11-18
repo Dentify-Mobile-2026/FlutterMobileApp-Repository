@@ -6,6 +6,7 @@ import 'package:dentify_flutter/iam/presentation/view/register.dart';
 import 'package:dentify_flutter/inventory/presentation/view/items_view.dart';
 import 'package:dentify_flutter/navigation/startup_redirect.dart';
 import 'package:dentify_flutter/patientAttention/appointments/presentation/view/appointments_view.dart';
+import 'package:dentify_flutter/patientAttention/treatments/presentation/view/treatments_view.dart';
 import 'package:dentify_flutter/payment/presentation/navigation/navigation.dart'; // Importa paymentRoutes
 import 'package:dentify_flutter/patientAttention/patients/presentation/view/patients_view.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +59,8 @@ class DentifyApp extends ConsumerWidget {
         '/appointments':
             (context) => DrawerWrapper(content: AppointmentsView()),
         '/profile': (context) => DrawerWrapper(content: ProfileScreen()),
-        '/patients': (context) => DrawerWrapper(content: PatientsView()),
+        '/patients': (context) => const DrawerWrapper(content: PatientsView()),
+        '/treatments': (context) => const DrawerWrapper(content: TreatmentsView()),
         '/home': (context) => const DrawerWrapper(content: DashboardScreen()),
         ...paymentRoutes(ref),
         '/inventory': (context) => DrawerWrapper(content: ItemsView()),

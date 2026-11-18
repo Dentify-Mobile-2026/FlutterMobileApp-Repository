@@ -1,11 +1,12 @@
-import 'package:dentify_flutter/iam/data/storage/token_storage.dart';
+import 'dart:convert';
 import 'package:dentify_flutter/core/network/api_constants.dart';
+import 'package:dentify_flutter/iam/data/storage/token_storage.dart';
 import 'package:dentify_flutter/patientAttention/appointments/data/model/appointment_response.dart';
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/add_appointment_request.dart';
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/update_appointment_request.dart';
+import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/update_appointment_status_request.dart';
 import 'package:dentify_flutter/patientAttention/appointments/domain/model/appointment_conflict_exception.dart';
 import 'package:dentify_flutter/patientAttention/appointments/domain/model/patient_data_form.dart';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AppointmentService {
@@ -43,7 +44,6 @@ class AppointmentService {
     );
 
     if (response.statusCode == 200) {
-      print("BODY: ${response.body}");
       final List<dynamic> jsonResponse = json.decode(response.body);
       return jsonResponse
           .map((appointment) => AppointmentResponse.fromJson(appointment))
@@ -51,8 +51,6 @@ class AppointmentService {
     } else if (response.statusCode == 404) {
       return [];
     } else {
-      print("STATUS: ${response.statusCode}");
-      print("BODY: ${response.body}");
       throw Exception('Failed to load appointments');
     }
   }
@@ -100,6 +98,26 @@ class AppointmentService {
     }
   }
 
+  Future<void> updateAppointmentStatus(
+    int id,
+    UpdateAppointmentStatusRequest request,
+  ) async {
+    final token = await TokenStorage.getAccessToken();
+
+    final response = await http.put(
+      ApiConstants.endpoint(baseUrl, 'v1/appointments/$id/status'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+      },
+      body: json.encode(request.toJson()),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update appointment status');
+    }
+  }
+
   Future<void> deleteAppointment(int id) async {
     final token = await TokenStorage.getAccessToken();
 
@@ -111,7 +129,7 @@ class AppointmentService {
       },
     );
 
-    if (response.statusCode != 204) {
+    if (response.statusCode != 204 && response.statusCode != 200) {
       throw Exception('Failed to delete appointment');
     }
   }

@@ -1,5 +1,6 @@
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/add_appointment_request.dart';
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/update_appointment_request.dart';
+import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/update_appointment_status_request.dart';
 import 'package:dentify_flutter/patientAttention/appointments/domain/model/appointment.dart';
 
 abstract class AppointmentRepository {
@@ -7,5 +8,7 @@ abstract class AppointmentRepository {
   Future<Appointment> getAppointmentById(int id);
   Future<void> createAppointment(AddAppointmentRequest appointment);
   Future<void> updateAppointment(int id, UpdateAppointmentRequest appointment);
+  Future<void> updateAppointmentStatus(
+      int id, UpdateAppointmentStatusRequest request);
   Future<void> deleteAppointment(int id);
 }

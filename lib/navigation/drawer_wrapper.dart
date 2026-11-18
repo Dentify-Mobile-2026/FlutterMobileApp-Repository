@@ -121,6 +121,7 @@ class DrawerContent extends StatelessWidget {
     _DrawerItem(label: "Dashboard", icon: Icons.dashboard, route: "/home"),
     _DrawerItem(label: "Appointments", icon: Icons.calendar_today, route: "/appointments"),
     _DrawerItem(label: "Patients", icon: Icons.people, route: "/patients"),
+    _DrawerItem(label: "Treatments", icon: Icons.medical_services, route: "/treatments"),
     _DrawerItem(label: "Inventory", icon: Icons.inventory_2, route: "/inventory"),
     _DrawerItem(label: "Payments", icon: Icons.payment, route: "/payments"),
     _DrawerItem(label: "Profile", icon: Icons.person, route: "/profile"),
