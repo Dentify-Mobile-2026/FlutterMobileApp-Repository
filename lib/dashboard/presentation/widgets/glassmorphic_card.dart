@@ -21,7 +21,7 @@ class GlassmorphicCard extends StatefulWidget {
 
 class _GlassmorphicCardState extends State<GlassmorphicCard>
     with SingleTickerProviderStateMixin {
-  bool isExpanded = false;
+  bool isExpanded = true;
   late AnimationController _ctrl;
   late Animation<double> _scaleAnim;
 
@@ -47,8 +47,11 @@ class _GlassmorphicCardState extends State<GlassmorphicCard>
       child: ScaleTransition(
         scale: _scaleAnim,
         child: Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          color: Colors.white.withOpacity(0.1),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: const BorderSide(color: Color(0xFFE2E8F0)),
+          ),
+          color: Colors.white,
           child: AnimatedSize(
             duration: const Duration(milliseconds: 400),
             curve: Curves.easeInOut,
@@ -60,8 +63,11 @@ class _GlassmorphicCardState extends State<GlassmorphicCard>
                     children: [
                       Icon(widget.icon, color: widget.contentColor, size: 32),
                       const SizedBox(width: 16),
-                      Text(widget.title,
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      Expanded(
+                        child: Text(widget.title,
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                      ),
+                      Icon(isExpanded ? Icons.expand_less : Icons.expand_more, color: const Color(0xFF64748B)),
                     ],
                   ),
                   if (isExpanded) ...[

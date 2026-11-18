@@ -153,7 +153,7 @@ class ItemsView extends ConsumerWidget {
                                 spacing: 16,
                                 runSpacing: 8,
                                 children: [
-                                  _InfoText(label: 'Price', value: '\$${item.price}'),
+                                  _InfoText(label: 'Price', value: 'S/ ${item.price.toStringAsFixed(2)}'),
                                   _InfoText(label: 'Stock', value: '${item.stockQuantity}'),
                                   _InfoText(label: 'Active', value: item.isActive ? 'Yes' : 'No'),
                                 ],
