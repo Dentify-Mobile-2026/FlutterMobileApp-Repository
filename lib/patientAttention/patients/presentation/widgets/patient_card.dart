@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/patientAttention/patients/data/remote/dto/update_patient_request.dart';
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:dentify_flutter/patientAttention/patients/domain/model/patient.dart';
 import 'package:dentify_flutter/patientAttention/patients/presentation/di/presentation_module.dart';
 import 'package:dentify_flutter/patientAttention/patients/presentation/view/medical_histories_view.dart';
@@ -14,7 +15,7 @@ class PatientCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       color: Colors.white,
-      elevation: 4,
+      elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: Stack(
@@ -28,11 +29,11 @@ class PatientCard extends ConsumerWidget {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFFD1F2EB),
+                        color: AppColors.mint,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       padding: const EdgeInsets.all(8),
-                      child: const Icon(Icons.people, color: Color(0xFF2C3E50)),
+                      child: const Icon(Icons.people, color: AppColors.primary),
                     ),
                     const SizedBox(width: 8),
                     Column(
@@ -77,7 +78,7 @@ class PatientCard extends ConsumerWidget {
                   child: TextButton(
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.black,
-                      backgroundColor: Color(0xFFD1F2EB),
+                      backgroundColor: AppColors.mint,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -175,7 +176,7 @@ class PatientCard extends ConsumerWidget {
                                 ElevatedButton(
                                   onPressed: () => Navigator.pop(ctx, true),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF2C3E50),
+                                    backgroundColor: AppColors.primary,
                                     foregroundColor: Colors.white,
                                   ),
                                   child: const Text("Delete"),

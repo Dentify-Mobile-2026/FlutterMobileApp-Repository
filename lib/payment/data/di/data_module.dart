@@ -1,3 +1,4 @@
+import 'package:dentify_flutter/core/network/api_constants.dart';
 import 'package:dio/dio.dart';
 //import 'package:retrofit/retrofit.dart';
 //import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -28,7 +29,7 @@ class DataModule {
 
   // Servicio de facturas
   static InvoiceService getInvoiceService() {
-    return InvoiceService(getRetrofit());
+    return InvoiceService(getRetrofit(), baseUrl: ApiConstants.baseUrl);
   }
 
   // Repositorio de facturas

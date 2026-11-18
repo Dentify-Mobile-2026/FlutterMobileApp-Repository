@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/iam/presentation/di/presentation_module.dart';
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:dentify_flutter/iam/presentation/viewmodel/profile_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,10 +21,10 @@ class UpdatePasswordView extends ConsumerWidget {
     final confirmPass = TextEditingController();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FFFD),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Change Password', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF2C3E50),
+        backgroundColor: AppColors.primary,
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),
@@ -34,7 +35,7 @@ class UpdatePasswordView extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF2C3E50),
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(height: 24),
@@ -70,7 +71,7 @@ class UpdatePasswordView extends ConsumerWidget {
               icon: const Icon(Icons.lock_reset),
               label: const Text("Update Password"),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2C3E50),
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 minimumSize: const Size.fromHeight(48),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -92,11 +93,11 @@ class UpdatePasswordView extends ConsumerWidget {
         fillColor: Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFF2C3E50)),
+          borderSide: const BorderSide(color: AppColors.primary),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFF2C3E50), width: 1.5),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
       ),
     );

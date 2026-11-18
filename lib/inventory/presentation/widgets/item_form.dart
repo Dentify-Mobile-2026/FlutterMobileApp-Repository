@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/inventory/data/remote/dto/item_request.dart';
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:dentify_flutter/inventory/domain/model/item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -92,7 +93,7 @@ class _ItemFormDialogState extends ConsumerState<ItemFormDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      backgroundColor: const Color(0xFFF5FFFD), // Fondo como las tarjetas
+      backgroundColor: AppColors.background, // Fondo como las tarjetas
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
@@ -106,7 +107,7 @@ class _ItemFormDialogState extends ConsumerState<ItemFormDialog> {
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C3E50),
+                  color: AppColors.primary,
                 ),
               ),
               const SizedBox(height: 16),
@@ -129,7 +130,7 @@ class _ItemFormDialogState extends ConsumerState<ItemFormDialog> {
                   ElevatedButton(
                     onPressed: _submitForm,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2C3E50),
+                      backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),

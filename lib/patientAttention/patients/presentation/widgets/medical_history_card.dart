@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/patientAttention/patients/domain/model/medical_history.dart';
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -15,7 +16,7 @@ class MedicalHistoryCard extends ConsumerWidget{
 
     return Card(
       color: Colors.white,
-      elevation: 4,
+      elevation: 1,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
@@ -31,13 +32,13 @@ class MedicalHistoryCard extends ConsumerWidget{
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFFD1F2EB),
+                        color: AppColors.mint,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       padding: const EdgeInsets.all(8),
                       child: const Icon(
                         Icons.note_add,
-                        color: Color(0xFF2C3E50),
+                        color: AppColors.primary,
                       ),
                     ),
                     const SizedBox(width: 8),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import '../../domain/model/appointment_data_form.dart';
 import '../../data/remote/dto/add_invoice_request.dart';
 import '../../presentation/viewmodel/invoice_form_view_model.dart';
@@ -27,10 +28,11 @@ class AddInvoiceFormView extends StatelessWidget {
     viewModel.loadAppointments();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FFFD),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Add a New Invoice'),
-        backgroundColor: const Color(0xFF2C3E50),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -39,7 +41,7 @@ class AddInvoiceFormView extends StatelessWidget {
             Card(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               color: const Color(0xFFFFFFFF),
-              elevation: 4,
+              elevation: 1,
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -47,14 +49,14 @@ class AddInvoiceFormView extends StatelessWidget {
                   children: [
                     Row(
                       children: const [
-                        Icon(Icons.description, color: Color(0xFF2C3E50)),
+                        Icon(Icons.description, color: AppColors.primary),
                         SizedBox(width: 8),
                         Text(
                           'Add a new Invoice',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
-                            color: Color(0xFF2C3E50),
+                            color: AppColors.primary,
                           ),
                         ),
                       ],
@@ -89,7 +91,7 @@ class AddInvoiceFormView extends StatelessWidget {
                               child: ElevatedButton(
                                 onPressed: () => paymentMethodId.value = 1,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: value == 1 ? const Color(0xFF10B981) : Colors.grey[300],
+                                  backgroundColor: value == 1 ? AppColors.success : Colors.grey[300],
                                   foregroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 ),
@@ -101,7 +103,7 @@ class AddInvoiceFormView extends StatelessWidget {
                               child: ElevatedButton(
                                 onPressed: () => paymentMethodId.value = 2,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: value == 2 ? const Color(0xFF10B981) : Colors.grey[300],
+                                  backgroundColor: value == 2 ? AppColors.success : Colors.grey[300],
                                   foregroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 ),
@@ -119,7 +121,7 @@ class AddInvoiceFormView extends StatelessWidget {
                         child: Text(
                           '← Go back to invoice general view',
                           style: const TextStyle(
-                            color: Color(0xFF2C3E50),
+                            color: AppColors.primary,
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.underline,
                           ),
@@ -133,8 +135,15 @@ class AddInvoiceFormView extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: () {
+                final amount = int.tryParse(amountController.text.trim());
+                if (amount == null || amount <= 0 || appointmentId.value == 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Enter an amount and select an appointment')),
+                  );
+                  return;
+                }
                 final invoice = AddInvoiceRequest(
-                  amount: int.parse(amountController.text),
+                  amount: amount,
                   appointmentId: appointmentId.value,
                   paymentMethodId: paymentMethodId.value,
                 );
@@ -145,12 +154,17 @@ class AddInvoiceFormView extends StatelessWidget {
               icon: const Icon(Icons.save),
               label: const Text("Save Invoice"),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2C3E50),
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 textStyle: const TextStyle(fontWeight: FontWeight.bold),
               ),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton(
+              onPressed: toBack,
+              child: const Text('Cancel'),
             ),
           ],
         ),
@@ -187,11 +201,11 @@ class AddInvoiceFormView extends StatelessWidget {
       fillColor: Colors.white,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFF2C3E50)),
+        borderSide: const BorderSide(color: AppColors.primary),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFF2C3E50), width: 1.5),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
       ),
     );
   }

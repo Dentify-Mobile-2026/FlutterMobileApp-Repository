@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/main.dart';
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/add_appointment_request.dart';
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/update_appointment_request.dart';
 import 'package:dentify_flutter/patientAttention/appointments/presentation/di/presentation_module.dart';
@@ -72,16 +73,16 @@ class _AppointmentsViewState extends ConsumerState<AppointmentsView>
         ref.read(appointmentsViewModelProvider.notifier).errorMessage == null;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FFFD),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5FFFD),
+        backgroundColor: AppColors.background,
         automaticallyImplyLeading: false,
         elevation: 0,
         title: const Text(
           "Appointments",
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Color(0xFF2C3E50),
+            color: AppColors.primary,
           ),
         ),
       ),
@@ -102,7 +103,7 @@ class _AppointmentsViewState extends ConsumerState<AppointmentsView>
                   final appointment = appointments[index];
                   return Card(
                     color: Colors.white,
-                    elevation: 4,
+                    elevation: 1,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -116,13 +117,13 @@ class _AppointmentsViewState extends ConsumerState<AppointmentsView>
                             children: [
                               Container(
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFD1F2EB),
+                                  color: AppColors.mint,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 padding: const EdgeInsets.all(8),
                                 child: const Icon(
                                   Icons.content_paste,
-                                  color: Color(0xFF2C3E50),
+                                  color: AppColors.primary,
                                 ),
                               ),
                               const SizedBox(width: 8),
@@ -193,9 +194,9 @@ class _AppointmentsViewState extends ConsumerState<AppointmentsView>
                               OutlinedButton(
                                 style: OutlinedButton.styleFrom(
                                   side: const BorderSide(
-                                    color: Color(0xFF2C3E50),
+                                    color: AppColors.primary,
                                   ),
-                                  foregroundColor: const Color(0xFF2C3E50),
+                                  foregroundColor: AppColors.primary,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 16,
                                     vertical: 8,
@@ -253,9 +254,9 @@ class _AppointmentsViewState extends ConsumerState<AppointmentsView>
                               OutlinedButton(
                                 style: OutlinedButton.styleFrom(
                                   side: const BorderSide(
-                                    color: Color(0xFF2C3E50),
+                                    color: AppColors.primary,
                                   ),
-                                  foregroundColor: const Color(0xFF2C3E50),
+                                  foregroundColor: AppColors.primary,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 16,
                                     vertical: 8,
@@ -350,7 +351,7 @@ class _AppointmentsViewState extends ConsumerState<AppointmentsView>
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2C3E50),
+              backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
@@ -381,7 +382,7 @@ class InfoRow extends StatelessWidget {
             label,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
-              color: Color(0xFF2C3E50),
+              color: AppColors.primary,
             ),
           ),
           const SizedBox(width: 6),

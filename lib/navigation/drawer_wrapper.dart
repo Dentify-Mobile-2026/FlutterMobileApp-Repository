@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/iam/data/storage/token_storage.dart';
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class DrawerWrapper extends StatelessWidget {
@@ -9,18 +10,18 @@ class DrawerWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FFFD),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 2,
         title: const Text(
           "Dentify App",
           style: TextStyle(
-            color: Color(0xFF2C3E50),
+            color: AppColors.primary,
             fontWeight: FontWeight.bold,
           ),
         ),
-        iconTheme: const IconThemeData(color: Color(0xFF2C3E50)),
+        iconTheme: const IconThemeData(color: AppColors.primary),
       ),
       drawer: Drawer(
         shape: const RoundedRectangleBorder(
@@ -56,7 +57,11 @@ class DrawerContent extends StatelessWidget {
       children: [
         Container(
           decoration: const BoxDecoration(
-            color: Color(0xFFD1F2EB),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [AppColors.primaryDark, AppColors.primary],
+            ),
             borderRadius: BorderRadius.only(
               bottomRight: Radius.circular(24),
             ),
@@ -64,14 +69,14 @@ class DrawerContent extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
           child: Row(
             children: const [
-              Icon(Icons.account_circle, size: 48, color: Color(0xFF2C3E50)),
+              Icon(Icons.medical_services_outlined, size: 44, color: Colors.white),
               SizedBox(width: 16),
               Text(
-                'Dentify App',
+                'Dentify',
                 style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C3E50),
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
                 ),
               ),
             ],
@@ -81,12 +86,12 @@ class DrawerContent extends StatelessWidget {
         const SizedBox(height: 8),
         ..._drawerItems.map((item) {
           return ListTile(
-            leading: Icon(item.icon, color: const Color(0xFF2C3E50)),
+            leading: Icon(item.icon, color: AppColors.primary),
             title: Text(
               item.label,
               style: const TextStyle(
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF2C3E50),
+                color: AppColors.primary,
               ),
             ),
             onTap: () => onItemSelected(item.route),

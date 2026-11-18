@@ -1,3 +1,4 @@
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:dentify_flutter/dashboard/presentation/view/dashboard_screen.dart';
 import 'package:dentify_flutter/iam/presentation/di/presentation_module.dart';
 import 'package:dentify_flutter/iam/presentation/view/login.dart';
@@ -26,7 +27,7 @@ class DentifyApp extends ConsumerWidget {
       title: 'Dentify App',
       navigatorObservers: [routeObserver],
       debugShowCheckedModeBanner: false, // Desactiva el banner de debug
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: AppTheme.light,
       initialRoute: '/',
       routes: {
         '/': (context) => const StartupRedirect(),

@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/add_appointment_request.dart';
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:dentify_flutter/patientAttention/appointments/domain/model/patient_data_form.dart';
 import 'package:dentify_flutter/patientAttention/appointments/presentation/di/presentation_module.dart';
 import 'package:flutter/material.dart';
@@ -32,11 +33,11 @@ class _AddAppointmentFormState extends ConsumerState<AddAppointmentForm> {
     final patientsAsync = ref.watch(patientsDataFormProvider);
 
     return AlertDialog(
-      backgroundColor: const Color(0xFFF5FFFD),
+      backgroundColor: AppColors.background,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       title: const Text(
         "New Appointment",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2C3E50)),
+        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
       ),
       content: patientsAsync.when(
         loading:
@@ -96,7 +97,7 @@ class _AddAppointmentFormState extends ConsumerState<AddAppointmentForm> {
         ElevatedButton(
           onPressed: _submit,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF2C3E50),
+            backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
@@ -157,7 +158,7 @@ class _AddAppointmentFormState extends ConsumerState<AddAppointmentForm> {
           ),
         ),
         IconButton(
-          icon: const Icon(Icons.calendar_today, color: Color(0xFF2C3E50)),
+          icon: const Icon(Icons.calendar_today, color: AppColors.primary),
           onPressed: () async {
             final picked = await showDatePicker(
               context: context,
@@ -186,7 +187,7 @@ class _AddAppointmentFormState extends ConsumerState<AddAppointmentForm> {
           ),
         ),
         IconButton(
-          icon: const Icon(Icons.access_time, color: Color(0xFF2C3E50)),
+          icon: const Icon(Icons.access_time, color: AppColors.primary),
           onPressed: () async {
             final picked = await showTimePicker(
               context: context,
@@ -208,11 +209,11 @@ class _AddAppointmentFormState extends ConsumerState<AddAppointmentForm> {
       fillColor: Colors.white,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFF2C3E50)),
+        borderSide: const BorderSide(color: AppColors.primary),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFF2C3E50), width: 1.5),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
       ),
     );
   }

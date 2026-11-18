@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/dashboard/domain/model/dashboard_data.dart';
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'glassmorphic_card.dart';
 import 'circular_stock_indicator.dart';
@@ -17,14 +18,14 @@ class DashboardContent extends StatelessWidget {
         GlassmorphicCard(
           title: 'Items con Bajo Stock',
           icon: Icons.inventory,
-          contentColor: const Color(0xFFF59E0B),
+          contentColor: AppColors.warning,
           child: Column(
             children: (data.lowStockItems ?? []).take(3).map((i) =>
               CircularStockIndicator(
                 name: i.name ?? "Desconocido",
                 stock: i.stockQuantity ?? 0,
                 maxStock: 100,
-                color: const Color(0xFFF59E0B),
+                color: AppColors.warning,
               )
             ).toList(),
           ),
@@ -33,7 +34,7 @@ class DashboardContent extends StatelessWidget {
         GlassmorphicCard(
           title: 'Últimos Pagos',
           icon: Icons.payments,
-          contentColor: const Color(0xFF10B981),
+          contentColor: AppColors.success,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -43,7 +44,7 @@ class DashboardContent extends StatelessWidget {
               const SizedBox(height: 8),
               SparklinePayments(
                 payments: (data.recentPayments ?? []).map((e) => e.amount ?? 0.0).toList(),
-                color: const Color(0xFF10B981),
+                color: AppColors.success,
               ),
             ],
           ),
@@ -52,11 +53,11 @@ class DashboardContent extends StatelessWidget {
         GlassmorphicCard(
           title: 'Citas Recientes',
           icon: Icons.calendar_today,
-          contentColor: const Color(0xFF4A90E2),
+          contentColor: AppColors.primary,
           child: Column(
             children: (data.recentAppointments ?? []).map((a) =>
               ListTile(
-                leading: const Icon(Icons.calendar_today, color: Color(0xFF4A90E2)),
+                leading: const Icon(Icons.calendar_today, color: AppColors.primary),
                 title: Text(a.reason ?? 'Sin motivo'),
                 subtitle: Text('${a.appointmentDate ?? "Fecha desconocida"} • ${a.duration ?? "N/A"}'),
               )

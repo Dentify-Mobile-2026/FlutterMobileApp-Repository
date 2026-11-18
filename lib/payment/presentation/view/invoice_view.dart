@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import '../../domain/model/invoice.dart';
 import '../../presentation/viewmodel/invoice_view_model.dart';
 
@@ -51,7 +52,7 @@ class _InvoiceViewState extends State<InvoiceView> {
       floatingActionButton: FloatingActionButton(
         onPressed: widget.toAddInvoiceForm,
         child: Icon(Icons.add),
-        backgroundColor: Color(0xFF2C3E50),
+        backgroundColor: AppColors.primary,
       ),
     );
   }
@@ -66,7 +67,7 @@ class InvoiceItemView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 4,
+      elevation: 1,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

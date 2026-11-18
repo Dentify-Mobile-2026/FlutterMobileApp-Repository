@@ -19,7 +19,7 @@ class RegisterViewModel extends StateNotifier<Login?> {
 
   bool get isAuthenticated => state != null;
 
-  void register() async {
+  Future<void> register() async {
     try {
       // Asegúrate de pasar todas las propiedades correctas
       final registerModel = Register(

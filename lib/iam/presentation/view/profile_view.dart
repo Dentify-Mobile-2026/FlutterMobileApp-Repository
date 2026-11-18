@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/iam/presentation/di/presentation_module.dart';
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:dentify_flutter/iam/presentation/viewmodel/profile_view_model.dart';
 import 'package:dentify_flutter/iam/presentation/widgets/profile_field.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
     final errorMessage = ref.watch(profileViewModelProvider.select((state) => state.errorMessage));
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FFFD),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Profile'),
         backgroundColor: const Color.fromARGB(255, 204, 224, 245),
@@ -46,7 +47,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF2C3E50),
+                          color: AppColors.primary,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -68,7 +69,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                         icon: const Icon(Icons.edit),
                         label: const Text("Update Information"),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2C3E50),
+                          backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
                           minimumSize: const Size.fromHeight(48),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -80,7 +81,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                         icon: const Icon(Icons.lock),
                         label: const Text("Change Password"),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2C3E50),
+                          backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
                           minimumSize: const Size.fromHeight(48),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

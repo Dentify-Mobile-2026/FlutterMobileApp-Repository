@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/iam/data/remote/dto/update_infomation_request.dart';
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:dentify_flutter/iam/presentation/di/presentation_module.dart';
 import 'package:dentify_flutter/iam/presentation/viewmodel/profile_view_model.dart';
 import 'package:flutter/material.dart';
@@ -21,10 +22,10 @@ class UpdateInformationView extends ConsumerWidget {
     final companyController = TextEditingController(text: state.userInfo?.companyName ?? '');
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FFFD),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Update Info', style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFF2C3E50),
+        backgroundColor: AppColors.primary,
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),
@@ -35,7 +36,7 @@ class UpdateInformationView extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF2C3E50),
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(height: 20),
@@ -72,7 +73,7 @@ class UpdateInformationView extends ConsumerWidget {
               icon: const Icon(Icons.save),
               label: const Text("Save"),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2C3E50),
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 minimumSize: const Size.fromHeight(48),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -93,11 +94,11 @@ class UpdateInformationView extends ConsumerWidget {
         fillColor: Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFF2C3E50)),
+          borderSide: const BorderSide(color: AppColors.primary),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFF2C3E50), width: 1.5),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/update_appointment_request.dart';
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:dentify_flutter/patientAttention/appointments/domain/model/appointment.dart';
 import 'package:flutter/material.dart';
 
@@ -70,11 +71,11 @@ class _EditAppointmentFormState extends State<EditAppointmentForm> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: const Color(0xFFF5FFFD),
+      backgroundColor: AppColors.background,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       title: const Text(
         "Edit Appointment",
-        style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2C3E50)),
+        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
       ),
       content: Form(
         key: _formKey,
@@ -87,7 +88,7 @@ class _EditAppointmentFormState extends State<EditAppointmentForm> {
                 icon: const Icon(Icons.calendar_today),
                 label: const Text("Pick date"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2C3E50),
+                  backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -100,7 +101,7 @@ class _EditAppointmentFormState extends State<EditAppointmentForm> {
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  color: Color(0xFF2C3E50),
+                  color: AppColors.primary,
                 ),
               ),
               const SizedBox(height: 12),
@@ -109,7 +110,7 @@ class _EditAppointmentFormState extends State<EditAppointmentForm> {
                 icon: const Icon(Icons.access_time),
                 label: const Text("Pick time"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2C3E50),
+                  backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -124,7 +125,7 @@ class _EditAppointmentFormState extends State<EditAppointmentForm> {
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  color: Color(0xFF2C3E50),
+                  color: AppColors.primary,
                 ),
               ),
               const SizedBox(height: 16),
@@ -185,7 +186,7 @@ class _EditAppointmentFormState extends State<EditAppointmentForm> {
             }
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF2C3E50),
+            backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
@@ -205,11 +206,11 @@ class _EditAppointmentFormState extends State<EditAppointmentForm> {
       fillColor: Colors.white,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFF2C3E50)),
+        borderSide: const BorderSide(color: AppColors.primary),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFF2C3E50), width: 1.5),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
       ),
     );
   }

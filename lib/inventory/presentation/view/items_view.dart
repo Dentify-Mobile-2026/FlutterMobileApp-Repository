@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/inventory/data/remote/dto/item_request.dart';
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:dentify_flutter/inventory/presentation/widgets/item_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,10 +15,10 @@ class ItemsView extends ConsumerWidget {
     final isLoading = items.isEmpty && itemsNotifier.errorMessage == null;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FFFD), // Fondo general
+      backgroundColor: AppColors.background, // Fondo general
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: const Color(0xFFF5FFFD),
+        backgroundColor: AppColors.background,
         title: const Text(
           "Items",
           style: TextStyle(
@@ -45,7 +46,7 @@ class ItemsView extends ConsumerWidget {
                 final item = items[index];
                 return Card(
                   color: const Color.fromARGB(255, 255, 255, 255), // Color de la tarjeta
-                  elevation: 4,
+                  elevation: 1,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -57,13 +58,13 @@ class ItemsView extends ConsumerWidget {
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFFD1F2EB),
+                            color: AppColors.mint,
                             borderRadius: BorderRadius.circular(12)
                           ),
                           padding: const EdgeInsets.all(12),
                           child: const Icon(
                             Icons.inventory_2_outlined,
-                            color: Color(0xFF2C3E50),
+                            color: AppColors.primary,
                             size: 32,
                           ),
                         ),
@@ -81,7 +82,7 @@ class ItemsView extends ConsumerWidget {
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFF2C3E50),
+                                        color: AppColors.primary,
                                       ),
                                     ),
                                   ),
@@ -179,7 +180,7 @@ class ItemsView extends ConsumerWidget {
             ref.read(itemsViewModelProvider.notifier).getAllItems();
           }
         },
-        backgroundColor: const Color(0xFF2C3E50),
+        backgroundColor: AppColors.primary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
         ),

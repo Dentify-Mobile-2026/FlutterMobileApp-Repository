@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/patientAttention/patients/data/remote/dto/add_medical_history_request.dart';
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:dentify_flutter/patientAttention/patients/domain/model/patient.dart';
 import 'package:dentify_flutter/patientAttention/patients/presentation/di/presentation_module.dart';
 import 'package:dentify_flutter/patientAttention/patients/presentation/widgets/medical_history_card.dart';
@@ -16,7 +17,7 @@ class MedicalHistoriesView extends ConsumerWidget{
     final isLoading = ref.watch(medicalHistoriesViewModelProvider(patient.id).notifier).isLoading;
     
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FFFD),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text("${patient.firstName} ${patient.lastName}",
@@ -58,7 +59,7 @@ class MedicalHistoriesView extends ConsumerWidget{
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2C3E50),
+              backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(

@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/patientAttention/patients/data/remote/dto/add_patient_request.dart';
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:dentify_flutter/patientAttention/patients/presentation/di/presentation_module.dart';
 import 'package:dentify_flutter/patientAttention/patients/presentation/widgets/patient_card.dart';
 import 'package:dentify_flutter/patientAttention/patients/presentation/widgets/patient_form.dart';
@@ -14,9 +15,9 @@ class PatientsView extends ConsumerWidget {
     final isLoading = ref.watch(isLoadingProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FFFD),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5FFFD),
+        backgroundColor: AppColors.background,
         automaticallyImplyLeading: false,
         title: const Text("Patients",
       style: TextStyle(fontWeight: FontWeight.bold),)),
@@ -28,7 +29,7 @@ class PatientsView extends ConsumerWidget {
               onChanged: (value) {
                 ref.read(patientSearchQueryProvider.notifier).state = value;
               },
-            cursorColor: const Color(0xFF2C3E50),
+            cursorColor: AppColors.primary,
             decoration: InputDecoration(
             filled: true,
             fillColor: Colors.white,
@@ -36,7 +37,7 @@ class PatientsView extends ConsumerWidget {
             focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(
                 width: 1,
-                color: const Color(0xFF2C3E50),
+                color: AppColors.primary,
                 ),
               borderRadius: BorderRadius.circular(24),
               ),
@@ -86,7 +87,7 @@ class PatientsView extends ConsumerWidget {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2C3E50),
+              backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
