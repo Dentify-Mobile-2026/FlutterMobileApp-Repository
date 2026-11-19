@@ -33,7 +33,10 @@ class DrawerWrapper extends StatelessWidget {
         backgroundColor: Colors.white,
         child: DrawerContent(
           onItemSelected: (route) {
-            Navigator.of(context).pushNamed(route);
+            Navigator.of(context).pop();
+            if (ModalRoute.of(context)?.settings.name != route) {
+              Navigator.of(context).pushReplacementNamed(route);
+            }
           },
         ),
       ),
@@ -48,7 +51,7 @@ class DrawerWrapper extends StatelessWidget {
 class DrawerContent extends StatelessWidget {
   final Function(String) onItemSelected;
 
-  const DrawerContent({required this.onItemSelected, Key? key}) : super(key: key);
+  const DrawerContent({required this.onItemSelected, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +99,7 @@ class DrawerContent extends StatelessWidget {
             ),
             onTap: () => onItemSelected(item.route),
           );
-        }).toList(),
+        }),
 
         const Divider(thickness: 1, height: 32),
         ListTile(
@@ -108,8 +111,9 @@ class DrawerContent extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          onTap: () {
-            TokenStorage.clearTokens();
+          onTap: () async {
+            await TokenStorage.clearTokens();
+            if (!context.mounted) return;
             Navigator.of(context).pushNamedAndRemoveUntil("/login", (route) => false);
           },
         ),
