@@ -4,6 +4,7 @@ import 'package:dentify_flutter/iam/presentation/di/presentation_module.dart';
 import 'package:dentify_flutter/iam/presentation/view/login.dart';
 import 'package:dentify_flutter/iam/presentation/view/register.dart';
 import 'package:dentify_flutter/inventory/presentation/view/items_view.dart';
+import 'package:dentify_flutter/main.dart';
 import 'package:dentify_flutter/navigation/startup_redirect.dart';
 import 'package:dentify_flutter/patientAttention/appointments/presentation/view/appointments_view.dart';
 import 'package:dentify_flutter/payment/presentation/navigation/navigation.dart'; // Importa paymentRoutes
@@ -20,8 +21,6 @@ class DentifyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final loginViewModel = ref.read(loginViewModelProvider);
     final registerViewModel = ref.read(registerViewModelProvider);
-    final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
-
 
     return MaterialApp(
       title: 'Dentify App',
