@@ -100,7 +100,14 @@ class _AppointmentStatusDialogState extends State<AppointmentStatusDialog> {
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: AppointmentStatus.values.map((st) {
+                  children: AppointmentStatus.values.where((st) {
+                    // "En Atención" ocurre automáticamente en su horario; no permitir forzarla antes de la hora.
+                    if (st == AppointmentStatus.inProgress &&
+                        widget.appointment.isFuture) {
+                      return false;
+                    }
+                    return true;
+                  }).map((st) {
                     final selected = _selectedStatus == st;
                     return ChoiceChip(
                       avatar: Icon(st.icon, size: 17, color: st.color),

@@ -61,13 +61,24 @@ final appointmentsViewModelProvider =
 
 final appointmentStatusFilterProvider = StateProvider<String?>((ref) => null);
 final appointmentSearchQueryProvider = StateProvider<String>((ref) => '');
+final appointmentSelectedDateProvider = StateProvider<DateTime?>((ref) => null);
 
 final filteredAppointmentsProvider = Provider<List<Appointment>>((ref) {
   final appointments = ref.watch(appointmentsViewModelProvider);
   final statusFilter = ref.watch(appointmentStatusFilterProvider);
+  final selectedDate = ref.watch(appointmentSelectedDateProvider);
   final query = ref.watch(appointmentSearchQueryProvider).toLowerCase().trim();
 
   return appointments.where((a) {
+    if (selectedDate != null) {
+      final dt = a.startDateTime;
+      if (dt == null ||
+          dt.year != selectedDate.year ||
+          dt.month != selectedDate.month ||
+          dt.day != selectedDate.day) {
+        return false;
+      }
+    }
     if (statusFilter != null && a.statusEnum.code != statusFilter) return false;
     if (query.isEmpty) return true;
     return a.patientName.toLowerCase().contains(query) ||

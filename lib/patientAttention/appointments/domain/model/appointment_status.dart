@@ -4,15 +4,8 @@ import 'package:flutter/material.dart';
 enum AppointmentStatus {
   scheduled(
     code: 'SCHEDULED',
-    label: 'Agendada',
+    label: 'Reservada',
     icon: Icons.event_available_outlined,
-    color: AppColors.info,
-    bgColor: AppColors.infoLight,
-  ),
-  confirmed(
-    code: 'CONFIRMED',
-    label: 'Confirmada',
-    icon: Icons.verified_outlined,
     color: AppColors.primary,
     bgColor: AppColors.mint,
   ),
@@ -59,8 +52,10 @@ enum AppointmentStatus {
     required this.bgColor,
   });
 
+  /// Mapea códigos del backend al estado simplificado (CONFIRMED se unifica con SCHEDULED = "Reservada").
   static AppointmentStatus fromCode(String raw, {bool fallbackCompleted = false}) {
     final normalized = raw.trim().toUpperCase();
+    if (normalized == 'CONFIRMED') return AppointmentStatus.scheduled;
     for (final s in AppointmentStatus.values) {
       if (s.code == normalized) return s;
     }
