@@ -1,3 +1,4 @@
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:dentify_flutter/dashboard/presentation/viewmodel/dashboard_view_model.dart';
 import 'package:dentify_flutter/dashboard/presentation/widgets/dashboard_content.dart';
 import 'package:dentify_flutter/dashboard/presentation/widgets/shimmer_loading.dart';
@@ -26,7 +27,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final state = ref.watch(dashboardViewModelProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Resumen de datos'), automaticallyImplyLeading: false),
+      backgroundColor: AppColors.background,
       body: state.when(
         loading: () => const ShimmerLoading(),
         data: (data) => DashboardContent(data: data),

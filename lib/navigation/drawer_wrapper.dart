@@ -1,7 +1,10 @@
-import 'package:dentify_flutter/iam/data/storage/token_storage.dart';
 import 'package:dentify_flutter/core/theme/app_theme.dart';
+import 'package:dentify_flutter/iam/data/storage/token_storage.dart';
 import 'package:flutter/material.dart';
 
+/// Contenedor principal responsive:
+/// - En pantallas anchas (>= 900px) muestra un sidebar lateral fijo minimalista.
+/// - En móvil / pantallas estrechas usa un Drawer deslizable con AppBar compacto.
 class DrawerWrapper extends StatelessWidget {
   final Widget content;
 
@@ -9,123 +12,266 @@ class DrawerWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentRoute = ModalRoute.of(context)?.settings.name ?? '/home';
+    final isDesktop = MediaQuery.of(context).size.width >= 900;
+
+    void navigate(String route) {
+      if (route == currentRoute) {
+        if (!isDesktop) Navigator.of(context).pop();
+        return;
+      }
+      Navigator.of(context).pushReplacementNamed(route);
+    }
+
+    if (isDesktop) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        body: Row(
+          children: [
+            Container(
+              width: 232,
+              decoration: const BoxDecoration(
+                color: AppColors.surface,
+                border: Border(right: BorderSide(color: AppColors.border)),
+              ),
+              child: DrawerContent(
+                currentRoute: currentRoute,
+                onItemSelected: navigate,
+              ),
+            ),
+            Expanded(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1240),
+                  child: content,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 2,
-        title: const Text(
-          "Dentify App",
-          style: TextStyle(
-            color: AppColors.primary,
-            fontWeight: FontWeight.bold,
-          ),
+        backgroundColor: AppColors.surface,
+        elevation: 0,
+        toolbarHeight: 54,
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(height: 1),
         ),
-        iconTheme: const IconThemeData(color: AppColors.primary),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppColors.mint,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.medical_services_rounded,
+                size: 18,
+                color: AppColors.primary,
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'Dentify',
+              style: TextStyle(
+                color: AppColors.ink,
+                fontWeight: FontWeight.w800,
+                fontSize: 17,
+              ),
+            ),
+          ],
+        ),
+        iconTheme: const IconThemeData(color: AppColors.ink),
       ),
       drawer: Drawer(
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topRight: Radius.circular(24),
-            
-          ),
-        ),
-        backgroundColor: Colors.white,
+        width: 256,
+        backgroundColor: AppColors.surface,
         child: DrawerContent(
-          onItemSelected: (route) {
-            Navigator.of(context).pushNamed(route);
-          },
+          currentRoute: currentRoute,
+          onItemSelected: navigate,
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: content,
-      ),
+      body: content,
     );
   }
 }
 
 class DrawerContent extends StatelessWidget {
+  final String currentRoute;
   final Function(String) onItemSelected;
 
-  const DrawerContent({required this.onItemSelected, Key? key}) : super(key: key);
+  const DrawerContent({
+    required this.currentRoute,
+    required this.onItemSelected,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: EdgeInsets.zero,
-      children: [
-        Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [AppColors.primaryDark, AppColors.primary],
-            ),
-            borderRadius: BorderRadius.only(
-              bottomRight: Radius.circular(24),
+    return SafeArea(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.medical_services_rounded,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Dentify',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.ink,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    Text(
+                      'Gestión Odontológica',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.muted,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-          child: Row(
-            children: const [
-              Icon(Icons.medical_services_outlined, size: 44, color: Colors.white),
-              SizedBox(width: 16),
-              Text(
-                'Dentify',
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
+          const Divider(height: 1),
+          const SizedBox(height: 8),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              children: _drawerItems.map((item) {
+                final isSelected = currentRoute == item.route;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Material(
+                    color: isSelected ? AppColors.mint : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () => onItemSelected(item.route),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                        child: Row(
+                          children: [
+                            Icon(
+                              item.icon,
+                              size: 19,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.muted,
+                            ),
+                            const SizedBox(width: 11),
+                            Expanded(
+                              child: Text(
+                                item.label,
+                                style: TextStyle(
+                                  fontSize: 13.5,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                  color: isSelected
+                                      ? AppColors.primaryDark
+                                      : AppColors.ink,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const Divider(height: 1),
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(10),
+                onTap: () {
+                  TokenStorage.clearTokens();
+                  Navigator.of(context)
+                      .pushNamedAndRemoveUntil('/login', (route) => false);
+                },
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  child: Row(
+                    children: [
+                      Icon(Icons.logout_rounded,
+                          size: 19, color: AppColors.danger),
+                      SizedBox(width: 11),
+                      Text(
+                        'Cerrar Sesión',
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          color: AppColors.danger,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 8),
-        ..._drawerItems.map((item) {
-          return ListTile(
-            leading: Icon(item.icon, color: AppColors.primary),
-            title: Text(
-              item.label,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                color: AppColors.primary,
-              ),
-            ),
-            onTap: () => onItemSelected(item.route),
-          );
-        }).toList(),
-
-        const Divider(thickness: 1, height: 32),
-        ListTile(
-          leading: const Icon(Icons.logout, color: Colors.red),
-          title: const Text(
-            "Logout",
-            style: TextStyle(
-              color: Colors.red,
-              fontWeight: FontWeight.bold,
             ),
           ),
-          onTap: () {
-            TokenStorage.clearTokens();
-            Navigator.of(context).pushNamedAndRemoveUntil("/login", (route) => false);
-          },
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   List<_DrawerItem> get _drawerItems => const [
-    _DrawerItem(label: "Dashboard", icon: Icons.dashboard, route: "/home"),
-    _DrawerItem(label: "Appointments", icon: Icons.calendar_today, route: "/appointments"),
-    _DrawerItem(label: "Patients", icon: Icons.people, route: "/patients"),
-    _DrawerItem(label: "Treatments", icon: Icons.medical_services, route: "/treatments"),
-    _DrawerItem(label: "Inventory", icon: Icons.inventory_2, route: "/inventory"),
-    _DrawerItem(label: "Payments", icon: Icons.payment, route: "/payments"),
-    _DrawerItem(label: "Profile", icon: Icons.person, route: "/profile"),
-  ];
+        _DrawerItem(
+            label: 'Dashboard', icon: Icons.space_dashboard_outlined, route: '/home'),
+        _DrawerItem(
+            label: 'Agenda de Citas',
+            icon: Icons.calendar_month_outlined,
+            route: '/appointments'),
+        _DrawerItem(
+            label: 'Pacientes', icon: Icons.people_outline_rounded, route: '/patients'),
+        _DrawerItem(
+            label: 'Tratamientos',
+            icon: Icons.medical_services_outlined,
+            route: '/treatments'),
+        _DrawerItem(
+            label: 'Inventario',
+            icon: Icons.inventory_2_outlined,
+            route: '/inventory'),
+        _DrawerItem(
+            label: 'Facturación', icon: Icons.receipt_long_outlined, route: '/payments'),
+        _DrawerItem(
+            label: 'Mi Perfil', icon: Icons.person_outline_rounded, route: '/profile'),
+      ];
 }
 
 class _DrawerItem {
