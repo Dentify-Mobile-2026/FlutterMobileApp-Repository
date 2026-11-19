@@ -23,7 +23,7 @@ class PatientViewModel extends StateNotifier<List<Patient>> {
     this.updatePatientUseCase,
     this.ref,
   ) : super([]) {
-    getAllPatients();
+    Future.microtask(getAllPatients);
   }
 
   Future<void> getAllPatients() async {

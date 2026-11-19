@@ -22,7 +22,7 @@ class TreatmentViewModel extends StateNotifier<List<Treatment>> {
     this.deleteTreatmentUseCase,
     this.ref,
   ) : super([]) {
-    getAllTreatments();
+    Future.microtask(getAllTreatments);
   }
 
   Future<void> getAllTreatments() async {

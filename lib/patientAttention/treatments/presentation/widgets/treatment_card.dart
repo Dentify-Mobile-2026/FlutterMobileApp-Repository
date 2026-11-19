@@ -18,30 +18,34 @@ class TreatmentCard extends ConsumerWidget {
     return Card(
       color: AppColors.surface,
       elevation: 0,
-      margin: const EdgeInsets.symmetric(vertical: 6),
+      margin: const EdgeInsets.symmetric(vertical: 5),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(14),
         side: const BorderSide(color: AppColors.border),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                color: cat.bgColor,
-                borderRadius: BorderRadius.circular(14),
+                color: AppColors.surfaceSubtle,
+                borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(cat.icon, color: cat.color, size: 26),
+              child: Icon(cat.icon, color: AppColors.primary, size: 20),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -49,20 +53,20 @@ class TreatmentCard extends ConsumerWidget {
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: cat.bgColor,
-                          borderRadius: BorderRadius.circular(8),
+                          color: AppColors.surfaceSubtle,
+                          borderRadius: BorderRadius.circular(7),
                         ),
                         child: Text(
                           cat.label,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: cat.color,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.ink,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
                       Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           const Icon(Icons.timer_outlined,
                               size: 14, color: AppColors.muted),
@@ -131,7 +135,7 @@ class TreatmentCard extends ConsumerWidget {
                       visualDensity: VisualDensity.compact,
                       tooltip: 'Editar tratamiento',
                       icon: const Icon(Icons.edit_outlined,
-                          size: 19, color: AppColors.primary),
+                          size: 18, color: AppColors.muted),
                       onPressed: () async {
                         final req = await showDialog<TreatmentRequest>(
                           context: context,
@@ -156,7 +160,7 @@ class TreatmentCard extends ConsumerWidget {
                       visualDensity: VisualDensity.compact,
                       tooltip: 'Eliminar tratamiento',
                       icon: const Icon(Icons.delete_outline,
-                          size: 19, color: AppColors.danger),
+                          size: 18, color: AppColors.muted),
                       onPressed: () async {
                         final confirm = await showDialog<bool>(
                           context: context,
