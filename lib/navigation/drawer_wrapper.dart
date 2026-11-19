@@ -219,8 +219,9 @@ class DrawerContent extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
               child: InkWell(
                 borderRadius: BorderRadius.circular(10),
-                onTap: () {
-                  TokenStorage.clearTokens();
+                onTap: () async {
+                  await TokenStorage.clearTokens();
+                  if (!context.mounted) return;
                   Navigator.of(context)
                       .pushNamedAndRemoveUntil('/login', (route) => false);
                 },
