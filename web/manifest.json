@@ -1,11 +1,11 @@
 {
-    "name": "dentify_flutter",
-    "short_name": "dentify_flutter",
+    "name": "Dentify",
+    "short_name": "Dentify",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F8FAFC",
+    "theme_color": "#0F766E",
+    "description": "Plataforma integral para la gestión de consultorios dentales.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

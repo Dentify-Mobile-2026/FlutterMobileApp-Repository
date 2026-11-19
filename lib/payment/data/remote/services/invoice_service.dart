@@ -5,7 +5,7 @@ import '../../remote/dto/add_invoice_request.dart';
 import '../../../../core/network/api_constants.dart';
 part 'invoice_service.g.dart';
 
-@RestApi(baseUrl: ApiConstants.baseUrl)
+@RestApi(baseUrl: ApiConstants.defaultBaseUrl)
 abstract class InvoiceService {
   factory InvoiceService(Dio dio, {String baseUrl}) = _InvoiceService;
 
