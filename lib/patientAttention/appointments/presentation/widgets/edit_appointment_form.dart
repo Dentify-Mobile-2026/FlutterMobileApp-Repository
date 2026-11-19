@@ -166,13 +166,15 @@ class _EditAppointmentFormState extends State<EditAppointmentForm> {
         ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate() && selectedTime != null) {
-              final fullDateTime = DateTime(
+              final dt = DateTime(
                 selectedDate.year,
                 selectedDate.month,
                 selectedDate.day,
                 selectedTime!.hour,
                 selectedTime!.minute,
-              ).toUtc().toIso8601String();
+              );
+              final fullDateTime =
+                  '${dt.year.toString().padLeft(4, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}T${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:00';
 
               final req = UpdateAppointmentRequest(
                 appointmentDate: fullDateTime,

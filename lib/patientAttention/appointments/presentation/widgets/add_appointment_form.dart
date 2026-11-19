@@ -15,7 +15,8 @@ String formatDurationFromMinutes(String minutesString) {
 }
 
 class AddAppointmentForm extends ConsumerStatefulWidget {
-  const AddAppointmentForm({super.key});
+  final DateTime? initialDate;
+  const AddAppointmentForm({super.key, this.initialDate});
 
   @override
   ConsumerState<AddAppointmentForm> createState() => _AddAppointmentFormState();
@@ -33,6 +34,12 @@ class _AddAppointmentFormState extends ConsumerState<AddAppointmentForm> {
   TimeOfDay? selectedTime;
   bool dateError = false;
   bool timeError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedDate = widget.initialDate ?? DateTime.now();
+  }
 
   @override
   void dispose() {
@@ -344,7 +351,7 @@ class _AddAppointmentFormState extends ConsumerState<AddAppointmentForm> {
         selectedTime!.minute,
       );
 
-      final appointmentDate = localDateTime.toUtc().toIso8601String();
+      final appointmentDate = _toLocalIso(localDateTime);
 
       final req = AddAppointmentRequest(
         appointmentDate: appointmentDate,
@@ -356,5 +363,14 @@ class _AddAppointmentFormState extends ConsumerState<AddAppointmentForm> {
 
       Navigator.pop(context, req);
     }
+  }
+
+  String _toLocalIso(DateTime dt) {
+    final y = dt.year.toString().padLeft(4, '0');
+    final m = dt.month.toString().padLeft(2, '0');
+    final d = dt.day.toString().padLeft(2, '0');
+    final h = dt.hour.toString().padLeft(2, '0');
+    final min = dt.minute.toString().padLeft(2, '0');
+    return '$y-$m-${d}T$h:$min:00';
   }
 }
