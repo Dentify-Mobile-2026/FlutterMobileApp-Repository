@@ -18,40 +18,37 @@ class PatientCard extends ConsumerWidget {
     return Card(
       color: AppColors.surface,
       elevation: 0,
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 5),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(14),
         side: BorderSide(
           color: patient.hasMedicalAlerts
-              ? AppColors.danger.withValues(alpha: 0.35)
+              ? AppColors.dangerBorder
               : AppColors.border,
-          width: patient.hasMedicalAlerts ? 1.4 : 1,
+          width: patient.hasMedicalAlerts ? 1.3 : 1,
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 CircleAvatar(
-                  radius: 24,
-                  backgroundColor:
-                      patient.hasMedicalAlerts ? AppColors.dangerLight : AppColors.mint,
+                  radius: 20,
+                  backgroundColor: AppColors.surfaceSubtle,
                   child: Text(
                     patient.initials,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 16,
-                      color: patient.hasMedicalAlerts
-                          ? AppColors.danger
-                          : AppColors.primary,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13.5,
+                      color: AppColors.primary,
                     ),
                   ),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,27 +59,27 @@ class PatientCard extends ConsumerWidget {
                             child: Text(
                               patient.fullName,
                               style: const TextStyle(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 17,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
                                 color: AppColors.ink,
                               ),
                             ),
                           ),
                           if (age != null) ...[
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 6),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
+                                horizontal: 7,
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
                                 color: AppColors.background,
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 '$age años',
                                 style: const TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.muted,
                                 ),
@@ -91,10 +88,10 @@ class PatientCard extends ConsumerWidget {
                           ],
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Wrap(
-                        spacing: 12,
-                        runSpacing: 4,
+                        spacing: 10,
+                        runSpacing: 2,
                         children: [
                           _metaChip(Icons.badge_outlined, 'DNI: ${patient.dni}'),
                           if (patient.phone.isNotEmpty)
@@ -109,14 +106,18 @@ class PatientCard extends ConsumerWidget {
                   children: [
                     IconButton(
                       tooltip: 'Editar paciente',
+                      visualDensity: VisualDensity.compact,
+                      iconSize: 18,
                       icon: const Icon(Icons.edit_outlined,
-                          size: 20, color: AppColors.primary),
+                          color: AppColors.muted),
                       onPressed: () => _onEdit(context, ref),
                     ),
                     IconButton(
                       tooltip: 'Eliminar paciente',
+                      visualDensity: VisualDensity.compact,
+                      iconSize: 18,
                       icon: const Icon(Icons.delete_outline,
-                          size: 20, color: AppColors.danger),
+                          color: AppColors.danger),
                       onPressed: () => _onDelete(context, ref),
                     ),
                   ],
@@ -125,62 +126,85 @@ class PatientCard extends ConsumerWidget {
             ),
 
             if (patient.hasMedicalAlerts) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppColors.dangerLight.withValues(alpha: 0.65),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.danger.withValues(alpha: 0.25),
-                  ),
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.dangerBorder),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (patient.hasAllergies)
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(Icons.warning_amber_rounded,
-                              size: 16, color: AppColors.danger),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              'Alergias: ${patient.allergies}',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.danger,
-                              ),
-                            ),
+                    Row(
+                      children: [
+                        Container(
+                          width: 7,
+                          height: 7,
+                          decoration: const BoxDecoration(
+                            color: AppColors.danger,
+                            shape: BoxShape.circle,
                           ),
-                        ],
+                        ),
+                        const SizedBox(width: 7),
+                        const Text(
+                          'Alerta Médica',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.danger,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    if (patient.hasAllergies)
+                      Text(
+                        'Alergias: ${patient.allergies}',
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.ink,
+                        ),
                       ),
                     if (patient.hasAllergies && patient.hasSystemicConditions)
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 3),
                     if (patient.hasSystemicConditions)
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(Icons.monitor_heart_outlined,
-                              size: 16, color: AppColors.ink),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              'Condiciones: ${patient.systemicConditions}',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.ink,
-                              ),
-                            ),
-                          ),
-                        ],
+                      Text(
+                        'Condiciones: ${patient.systemicConditions}',
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.muted,
+                        ),
                       ),
                   ],
                 ),
+              ),
+            ] else ...[
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: const BoxDecoration(
+                      color: AppColors.success,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 7),
+                  const Text(
+                    'Sin alertas médicas registradas',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.muted,
+                    ),
+                  ),
+                ],
               ),
             ],
 

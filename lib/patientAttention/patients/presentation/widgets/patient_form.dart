@@ -44,6 +44,7 @@ class _PatientFormState extends ConsumerState<PatientForm> {
   final emergencyContactName = TextEditingController();
   final emergencyContactPhone = TextEditingController();
 
+  bool hasMedicalAlert = false;
   DateTime? selectedDate;
   bool dateError = false;
 
@@ -58,8 +59,10 @@ class _PatientFormState extends ConsumerState<PatientForm> {
       email.text = p.email;
       phone.text = p.phone;
       homeAddress.text = p.homeAddress;
-      allergies.text = p.allergies;
-      systemicConditions.text = p.systemicConditions;
+      allergies.text = p.hasAllergies ? p.allergies : '';
+      systemicConditions.text =
+          p.hasSystemicConditions ? p.systemicConditions : '';
+      hasMedicalAlert = p.hasMedicalAlerts;
       emergencyContactName.text = p.emergencyContactName;
       emergencyContactPhone.text = p.emergencyContactPhone;
       selectedDate = DateTime.tryParse(p.birthday);
@@ -81,6 +84,30 @@ class _PatientFormState extends ConsumerState<PatientForm> {
     super.dispose();
   }
 
+  String _normalize(String s) {
+    return s
+        .toLowerCase()
+        .replaceAll('á', 'a')
+        .replaceAll('é', 'e')
+        .replaceAll('í', 'i')
+        .replaceAll('ó', 'o')
+        .replaceAll('ú', 'u')
+        .trim();
+  }
+
+  bool _matchesTag(String item, String tag) {
+    final normItem = _normalize(item);
+    final normTag = _normalize(tag);
+    if (normItem == normTag) return true;
+    final tagParts = normTag.split('/').map((e) => e.trim()).where((e) => e.isNotEmpty);
+    for (final part in tagParts) {
+      if (normItem.contains(part) || part.contains(normItem)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   void _toggleQuickTag(TextEditingController controller, String tag) {
     final currentItems = controller.text
         .split(',')
@@ -88,22 +115,25 @@ class _PatientFormState extends ConsumerState<PatientForm> {
         .where((e) => e.isNotEmpty)
         .toList();
 
-    final exists = currentItems.any((e) => e.toLowerCase() == tag.toLowerCase());
+    final exists = currentItems.any((e) => _matchesTag(e, tag));
     setState(() {
       if (exists) {
-        currentItems.removeWhere((e) => e.toLowerCase() == tag.toLowerCase());
+        currentItems.removeWhere((e) => _matchesTag(e, tag));
       } else {
         currentItems.add(tag);
       }
       controller.text = currentItems.join(', ');
+      hasMedicalAlert = allergies.text.trim().isNotEmpty ||
+          systemicConditions.text.trim().isNotEmpty;
     });
   }
 
   bool _isTagSelected(TextEditingController controller, String tag) {
-    return controller.text
+    final currentItems = controller.text
         .split(',')
-        .map((e) => e.trim().toLowerCase())
-        .contains(tag.toLowerCase());
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty);
+    return currentItems.any((e) => _matchesTag(e, tag));
   }
 
   @override
@@ -327,72 +357,175 @@ class _PatientFormState extends ConsumerState<PatientForm> {
                   const SizedBox(height: 20),
 
                   _sectionHeader(
-                    Icons.warning_amber_rounded,
-                    'Alertas Médicas Críticas',
-                    color: AppColors.danger,
+                    hasMedicalAlert
+                        ? Icons.warning_amber_rounded
+                        : Icons.verified_user_outlined,
+                    'Estado Clínico y Alertas Médicas',
+                    color: hasMedicalAlert ? AppColors.danger : AppColors.success,
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Selecciona o escribe alergias a medicamentos/anestesia:',
-                    style: TextStyle(fontSize: 12, color: AppColors.muted),
-                  ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 10),
                   Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: _commonAllergies.map((tag) {
-                      final selected = _isTagSelected(allergies, tag);
-                      return FilterChip(
-                        label: Text(tag, style: const TextStyle(fontSize: 12)),
-                        selected: selected,
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      ChoiceChip(
+                        avatar: const Icon(
+                          Icons.check_circle_outline,
+                          size: 16,
+                          color: AppColors.success,
+                        ),
+                        label: const Text(
+                          'Sin Alertas (Estable)',
+                          style: TextStyle(
+                              fontSize: 12.5, fontWeight: FontWeight.w600),
+                        ),
+                        selected: !hasMedicalAlert,
+                        selectedColor: AppColors.successLight,
+                        onSelected: (_) {
+                          setState(() {
+                            hasMedicalAlert = false;
+                            allergies.clear();
+                            systemicConditions.clear();
+                          });
+                        },
+                      ),
+                      ChoiceChip(
+                        avatar: const Icon(
+                          Icons.warning_amber_rounded,
+                          size: 16,
+                          color: AppColors.danger,
+                        ),
+                        label: const Text(
+                          'Con Alerta Médica',
+                          style: TextStyle(
+                              fontSize: 12.5, fontWeight: FontWeight.w600),
+                        ),
+                        selected: hasMedicalAlert,
                         selectedColor: AppColors.dangerLight,
-                        checkmarkColor: AppColors.danger,
-                        onSelected: (_) => _toggleQuickTag(allergies, tag),
-                      );
-                    }).toList(),
+                        onSelected: (_) {
+                          setState(() {
+                            hasMedicalAlert = true;
+                          });
+                        },
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: allergies,
-                    onChanged: (_) => setState(() {}),
-                    decoration: const InputDecoration(
-                      labelText: 'Alergias (separadas por coma)',
-                      hintText: 'Ej: Penicilina, Lidocaína, Látex',
-                      prefixIcon: Icon(Icons.medical_information_outlined,
-                          color: AppColors.danger, size: 20),
+                  if (!hasMedicalAlert) ...[
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.successLight,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.success.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.verified_outlined,
+                              color: AppColors.success, size: 18),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Sin alergias ni condiciones de riesgo registradas. Al guardar se quitará cualquier alerta roja.',
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.ink,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Condiciones sistémicas o preexistentes:',
-                    style: TextStyle(fontSize: 12, color: AppColors.muted),
-                  ),
-                  const SizedBox(height: 6),
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: _commonConditions.map((tag) {
-                      final selected = _isTagSelected(systemicConditions, tag);
-                      return FilterChip(
-                        label: Text(tag, style: const TextStyle(fontSize: 12)),
-                        selected: selected,
-                        selectedColor: AppColors.warningLight,
-                        checkmarkColor: AppColors.warning,
-                        onSelected: (_) => _toggleQuickTag(systemicConditions, tag),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: systemicConditions,
-                    onChanged: (_) => setState(() {}),
-                    decoration: const InputDecoration(
-                      labelText: 'Condiciones Preexistentes',
-                      hintText: 'Ej: Hipertensión, Diabetes, Embarazo',
-                      prefixIcon: Icon(Icons.monitor_heart_outlined,
-                          color: AppColors.warning, size: 20),
+                  ] else ...[
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Selecciona o escribe alergias a medicamentos/anestesia:',
+                      style: TextStyle(fontSize: 12, color: AppColors.muted),
                     ),
-                  ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: _commonAllergies.map((tag) {
+                        final selected = _isTagSelected(allergies, tag);
+                        return FilterChip(
+                          label: Text(tag, style: const TextStyle(fontSize: 12)),
+                          selected: selected,
+                          selectedColor: AppColors.dangerLight,
+                          checkmarkColor: AppColors.danger,
+                          onSelected: (_) => _toggleQuickTag(allergies, tag),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: allergies,
+                      onChanged: (_) => setState(() {}),
+                      decoration: InputDecoration(
+                        labelText: 'Alergias (separadas por coma)',
+                        hintText: 'Ej: Penicilina, Lidocaína, Látex',
+                        prefixIcon: const Icon(
+                          Icons.medical_information_outlined,
+                          color: AppColors.danger,
+                          size: 20,
+                        ),
+                        suffixIcon: allergies.text.isNotEmpty
+                            ? IconButton(
+                                tooltip: 'Limpiar alergias',
+                                icon: const Icon(Icons.clear, size: 18),
+                                onPressed: () => setState(() => allergies.clear()),
+                              )
+                            : null,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Condiciones sistémicas o preexistentes:',
+                      style: TextStyle(fontSize: 12, color: AppColors.muted),
+                    ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: _commonConditions.map((tag) {
+                        final selected = _isTagSelected(systemicConditions, tag);
+                        return FilterChip(
+                          label: Text(tag, style: const TextStyle(fontSize: 12)),
+                          selected: selected,
+                          selectedColor: AppColors.warningLight,
+                          checkmarkColor: AppColors.warning,
+                          onSelected: (_) =>
+                              _toggleQuickTag(systemicConditions, tag),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: systemicConditions,
+                      onChanged: (_) => setState(() {}),
+                      decoration: InputDecoration(
+                        labelText: 'Condiciones Preexistentes',
+                        hintText: 'Ej: Hipertensión, Diabetes, Embarazo',
+                        prefixIcon: const Icon(
+                          Icons.monitor_heart_outlined,
+                          color: AppColors.warning,
+                          size: 20,
+                        ),
+                        suffixIcon: systemicConditions.text.isNotEmpty
+                            ? IconButton(
+                                tooltip: 'Limpiar condiciones',
+                                icon: const Icon(Icons.clear, size: 18),
+                                onPressed: () =>
+                                    setState(() => systemicConditions.clear()),
+                              )
+                            : null,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 24),
 
                   Row(
@@ -462,6 +595,10 @@ class _PatientFormState extends ConsumerState<PatientForm> {
         '${selectedDate!.month.toString().padLeft(2, '0')}-'
         '${selectedDate!.day.toString().padLeft(2, '0')}';
 
+    final finalAllergies = hasMedicalAlert ? allergies.text.trim() : '';
+    final finalConditions =
+        hasMedicalAlert ? systemicConditions.text.trim() : '';
+
     if (widget.patient == null) {
       final request = AddPatientRequest(
         dni: dni.text.trim(),
@@ -471,8 +608,8 @@ class _PatientFormState extends ConsumerState<PatientForm> {
         homeAddress: homeAddress.text.trim(),
         birthday: birthday,
         phone: phone.text.trim(),
-        allergies: allergies.text.trim(),
-        systemicConditions: systemicConditions.text.trim(),
+        allergies: finalAllergies,
+        systemicConditions: finalConditions,
         emergencyContactName: emergencyContactName.text.trim(),
         emergencyContactPhone: emergencyContactPhone.text.trim(),
       );
@@ -486,8 +623,8 @@ class _PatientFormState extends ConsumerState<PatientForm> {
         homeAddress: homeAddress.text.trim(),
         birthday: birthday,
         phone: phone.text.trim(),
-        allergies: allergies.text.trim(),
-        systemicConditions: systemicConditions.text.trim(),
+        allergies: finalAllergies,
+        systemicConditions: finalConditions,
         emergencyContactName: emergencyContactName.text.trim(),
         emergencyContactPhone: emergencyContactPhone.text.trim(),
       );

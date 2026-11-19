@@ -36,9 +36,28 @@ class Patient {
     return combined.isEmpty ? 'P' : combined;
   }
 
-  bool get hasAllergies => allergies.trim().isNotEmpty;
+  static bool _isMeaningfulAlert(String value) {
+    final cleaned = value.trim().toLowerCase();
+    if (cleaned.isEmpty) return false;
+    const emptyTokens = {
+      'ninguna',
+      'ninguno',
+      'no',
+      'n/a',
+      'na',
+      'sin alergias',
+      'sin condiciones',
+      'sin alertas',
+      'sano',
+      'normal',
+      '-',
+    };
+    return !emptyTokens.contains(cleaned);
+  }
 
-  bool get hasSystemicConditions => systemicConditions.trim().isNotEmpty;
+  bool get hasAllergies => _isMeaningfulAlert(allergies);
+
+  bool get hasSystemicConditions => _isMeaningfulAlert(systemicConditions);
 
   bool get hasMedicalAlerts => hasAllergies || hasSystemicConditions;
 
