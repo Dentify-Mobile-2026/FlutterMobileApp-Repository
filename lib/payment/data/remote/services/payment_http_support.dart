@@ -38,8 +38,12 @@ List<Map<String, dynamic>> decodePaymentList(http.Response response) {
 }
 
 /// Construye la excepción a partir de una respuesta no 2xx, usando el mensaje
-/// del cuerpo `{"error": "..."}` cuando existe.
-PaymentApiException paymentApiExceptionFrom(http.Response response) {
+/// del cuerpo `{"error": "..."}` cuando existe. Si no lo hay, se usa
+/// [fallbackMessages] del endpoint o el mensaje genérico del código HTTP.
+PaymentApiException paymentApiExceptionFrom(
+  http.Response response, {
+  Map<int, String> fallbackMessages = const {},
+}) {
   final status = response.statusCode;
   String? serverMessage;
   try {
@@ -55,7 +59,10 @@ PaymentApiException paymentApiExceptionFrom(http.Response response) {
   } on FormatException {
     // Cuerpo no JSON: se usa el mensaje por defecto.
   }
-  return PaymentApiException(status, serverMessage ?? _defaultMessage(status));
+  return PaymentApiException(
+    status,
+    serverMessage ?? fallbackMessages[status] ?? _defaultMessage(status),
+  );
 }
 
 String _defaultMessage(int status) {

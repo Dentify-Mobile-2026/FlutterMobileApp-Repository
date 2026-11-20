@@ -4,10 +4,13 @@ import 'package:dentify_flutter/patientAttention/appointments/presentation/di/pr
 import 'package:dentify_flutter/payment/data/di/dependency_injection.dart';
 import 'package:dentify_flutter/payment/domain/model/invoice.dart';
 import 'package:dentify_flutter/payment/domain/model/invoice_eligibility.dart';
+import 'package:dentify_flutter/payment/domain/model/invoice_payment.dart';
 import 'package:dentify_flutter/payment/domain/model/payment_method.dart';
 import 'package:dentify_flutter/payment/domain/usecases/create_invoice_use_case.dart';
 import 'package:dentify_flutter/payment/domain/usecases/get_all_invoices_use_case.dart';
 import 'package:dentify_flutter/payment/domain/usecases/get_all_payment_methods_use_case.dart';
+import 'package:dentify_flutter/payment/domain/usecases/get_invoice_payments_use_case.dart';
+import 'package:dentify_flutter/payment/domain/usecases/register_invoice_payment_use_case.dart';
 import 'package:dentify_flutter/payment/presentation/viewmodel/invoice_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -17,6 +20,16 @@ final getAllInvoicesUseCaseProvider = Provider<GetAllInvoicesUseCase>((ref) {
 
 final createInvoiceUseCaseProvider = Provider<CreateInvoiceUseCase>((ref) {
   return CreateInvoiceUseCase(ref.read(invoiceRepositoryProvider));
+});
+
+final getInvoicePaymentsUseCaseProvider =
+    Provider<GetInvoicePaymentsUseCase>((ref) {
+  return GetInvoicePaymentsUseCase(ref.read(invoiceRepositoryProvider));
+});
+
+final registerInvoicePaymentUseCaseProvider =
+    Provider<RegisterInvoicePaymentUseCase>((ref) {
+  return RegisterInvoicePaymentUseCase(ref.read(invoiceRepositoryProvider));
 });
 
 final getAllPaymentMethodsUseCaseProvider =
@@ -36,7 +49,15 @@ final invoicesViewModelProvider =
   return InvoiceViewModel(
     ref.read(getAllInvoicesUseCaseProvider),
     ref.read(createInvoiceUseCaseProvider),
+    ref.read(registerInvoicePaymentUseCaseProvider),
   );
+});
+
+/// Abonos de un comprobante, en orden cronológico. Se libera al cerrar el
+/// detalle; al registrar un abono se invalida para volver a consultarse.
+final invoicePaymentsProvider = FutureProvider.autoDispose
+    .family<List<InvoicePayment>, int>((ref, invoiceId) {
+  return ref.read(getInvoicePaymentsUseCaseProvider)(invoiceId);
 });
 
 /// Citas del módulo de agenda (solo lectura) que aún se pueden cobrar.

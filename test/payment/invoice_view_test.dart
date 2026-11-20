@@ -2,9 +2,11 @@ import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:dentify_flutter/payment/data/di/dependency_injection.dart'
     as payment_data;
 import 'package:dentify_flutter/payment/domain/model/invoice.dart';
+import 'package:dentify_flutter/payment/domain/model/invoice_payment.dart';
 import 'package:dentify_flutter/payment/domain/model/money.dart';
 import 'package:dentify_flutter/payment/domain/model/new_invoice.dart';
 import 'package:dentify_flutter/payment/domain/model/payment_api_exception.dart';
+import 'package:dentify_flutter/payment/domain/model/register_payment.dart';
 import 'package:dentify_flutter/payment/domain/repository/invoice_repository.dart';
 import 'package:dentify_flutter/payment/presentation/view/invoice_view.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +28,13 @@ class _ScriptedInvoiceRepository implements InvoiceRepository {
 
   @override
   Future<void> create(NewInvoice invoice) async {}
+
+  @override
+  Future<List<InvoicePayment>> getPayments(int invoiceId) async => const [];
+
+  @override
+  Future<Invoice> registerPayment(int invoiceId, RegisterPayment payment) =>
+      throw UnimplementedError();
 }
 
 Future<void> _pumpView(WidgetTester tester, InvoiceRepository repository) async {

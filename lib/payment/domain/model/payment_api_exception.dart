@@ -8,7 +8,8 @@ class PaymentApiException implements Exception {
 
   const PaymentApiException(this.statusCode, this.message);
 
-  /// La cita ya tiene un comprobante registrado (HTTP 409).
+  /// Conflicto con el estado del servidor (HTTP 409): la cita ya tiene
+  /// comprobante, el abono excede el saldo o el `requestId` ya se usó.
   bool get isConflict => statusCode == 409;
 
   @override
