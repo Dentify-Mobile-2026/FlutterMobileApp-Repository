@@ -193,7 +193,8 @@ void main() {
           invoices: FakePaymentsInvoiceRepository(_invoices()),
         );
 
-        await tester.tap(find.byKey(InvoiceItemView.registerPaymentButtonKey(4)));
+        await tester
+            .tap(find.byKey(InvoiceItemView.registerPaymentButtonKey(4)));
         await tester.pumpAndSettle();
         expect(find.byType(RegisterPaymentDialog), findsOneWidget);
         expect(tester.takeException(), isNull);

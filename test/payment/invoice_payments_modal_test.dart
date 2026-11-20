@@ -11,8 +11,7 @@ import 'payment_test_support.dart';
 
 final _modal = find.byType(InvoicePaymentsModal);
 
-Finder _inModal(Finder finder) =>
-    find.descendant(of: _modal, matching: finder);
+Finder _inModal(Finder finder) => find.descendant(of: _modal, matching: finder);
 
 String _localStamp(DateTime utc) =>
     DateFormat('dd/MM/yyyy · hh:mm a').format(utc.toLocal());
@@ -89,7 +88,8 @@ void main() {
         await _openPayments(tester, 4);
 
         expect(_inModal(find.text('Ana Torres')), findsOneWidget);
-        expect(_inModal(find.text('Abonos del comprobante #4')), findsOneWidget);
+        expect(
+            _inModal(find.text('Abonos del comprobante #4')), findsOneWidget);
 
         // Resumen: total / pagado / saldo.
         expect(_inModal(find.text('Total')), findsOneWidget);
@@ -135,8 +135,8 @@ void main() {
               'no tiene abonos individuales')),
           findsOneWidget,
         );
-        expect(_inModal(find.text('Aún no hay abonos registrados')),
-            findsNothing);
+        expect(
+            _inModal(find.text('Aún no hay abonos registrados')), findsNothing);
         expect(tester.takeException(), isNull);
       });
 
@@ -159,8 +159,8 @@ void main() {
 
         expect(_inModal(find.text('No se pudieron cargar los abonos.')),
             findsOneWidget);
-        expect(_inModal(find.text('El comprobante no existe.')),
-            findsOneWidget);
+        expect(
+            _inModal(find.text('El comprobante no existe.')), findsOneWidget);
 
         repo.paymentsError = null;
         await tester.tap(_inModal(find.text('Reintentar')));

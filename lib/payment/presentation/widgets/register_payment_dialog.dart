@@ -136,8 +136,8 @@ class _RegisterPaymentDialogState extends ConsumerState<RegisterPaymentDialog> {
 
     final invoice =
         _currentInvoice(ref.read(invoicesViewModelProvider).valueOrNull);
-    final methods = ref.read(paymentMethodsProvider).valueOrNull ??
-        const <PaymentMethod>[];
+    final methods =
+        ref.read(paymentMethodsProvider).valueOrNull ?? const <PaymentMethod>[];
     final methodId =
         _pickIfPresent(_selectedMethodId, methods.map((m) => m.id));
     final formValid = _formKey.currentState?.validate() ?? false;
@@ -261,7 +261,8 @@ class _RegisterPaymentDialogState extends ConsumerState<RegisterPaymentDialog> {
                         padding: EdgeInsets.only(top: 6),
                         child: Text(
                           'Seleccione un método de pago',
-                          style: TextStyle(fontSize: 12, color: AppColors.danger),
+                          style:
+                              TextStyle(fontSize: 12, color: AppColors.danger),
                         ),
                       ),
                     const SizedBox(height: 18),
@@ -290,7 +291,8 @@ class _RegisterPaymentDialogState extends ConsumerState<RegisterPaymentDialog> {
                         padding: EdgeInsets.only(top: 8),
                         child: Text(
                           'Este comprobante ya no tiene saldo pendiente.',
-                          style: TextStyle(fontSize: 12.5, color: AppColors.muted),
+                          style:
+                              TextStyle(fontSize: 12.5, color: AppColors.muted),
                         ),
                       ),
                     if (_submitError != null) _buildSubmitError(_submitError!),
@@ -420,7 +422,8 @@ class _RegisterPaymentDialogState extends ConsumerState<RegisterPaymentDialog> {
                 Text(
                   'Pagado ${invoice.paidAmount.format()} de '
                   '${invoice.totalAmount.format()}',
-                  style: const TextStyle(fontSize: 11.5, color: AppColors.muted),
+                  style:
+                      const TextStyle(fontSize: 11.5, color: AppColors.muted),
                 ),
               ],
             ),

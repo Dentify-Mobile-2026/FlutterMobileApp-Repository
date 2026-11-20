@@ -341,7 +341,8 @@ class InvoicePaymentsModal extends ConsumerWidget {
                 const SizedBox(height: 2),
                 Text(
                   formatPaidAt(payment.paidAt),
-                  style: const TextStyle(fontSize: 11.5, color: AppColors.muted),
+                  style:
+                      const TextStyle(fontSize: 11.5, color: AppColors.muted),
                 ),
                 if (notes != null && notes.isNotEmpty)
                   Padding(

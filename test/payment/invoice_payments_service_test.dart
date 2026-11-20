@@ -227,7 +227,8 @@ void main() {
         service.registerPayment(12, _registerRequest()),
         throwsA(isA<PaymentApiException>()
             .having((e) => e.statusCode, 'statusCode', 400)
-            .having((e) => e.message, 'message', 'El monto debe ser mayor a 0')),
+            .having(
+                (e) => e.message, 'message', 'El monto debe ser mayor a 0')),
       );
     });
   });
@@ -255,8 +256,7 @@ void main() {
       final payments = await service.getInvoicePayments(12);
 
       expect(payments.single.amount.cents, 35000);
-      expect(payments.single.toDomain().paidAt,
-          DateTime.utc(2026, 11, 28, 14));
+      expect(payments.single.toDomain().paidAt, DateTime.utc(2026, 11, 28, 14));
     });
 
     test('a 404 means the invoice does not exist and throws', () async {
@@ -297,8 +297,7 @@ void main() {
               },
             ], 200)),
       );
-      final useCase =
-          GetInvoicePaymentsUseCase(InvoiceRepositoryImpl(service));
+      final useCase = GetInvoicePaymentsUseCase(InvoiceRepositoryImpl(service));
 
       final payments = await useCase(12);
 
