@@ -1,5 +1,6 @@
 import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:dentify_flutter/dashboard/domain/model/dashboard_data.dart';
+import 'package:dentify_flutter/dashboard/presentation/widgets/analytics_cards.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'sparkline_payments.dart';
@@ -125,6 +126,60 @@ class DashboardContent extends StatelessWidget {
             _appointmentsCard(appointments),
             const SizedBox(height: 12),
             _lowStockCard(lowStock),
+          ],
+
+          if (data.analytics != null) ...[
+            const SizedBox(height: 16),
+            const Text(
+              'Analítica Gerencial del Mes',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: AppColors.ink,
+                letterSpacing: -0.2,
+              ),
+            ),
+            const SizedBox(height: 10),
+            if (isWide)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 6,
+                    child: SpecialtyRevenueCard(
+                      items: data.analytics!.revenueBySpecialty,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 4,
+                    child: Column(
+                      children: [
+                        AttendanceRateCard(
+                          metrics: data.analytics!.attendance,
+                        ),
+                        const SizedBox(height: 12),
+                        FinancialBalanceCard(
+                          financials: data.analytics!.financials,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              )
+            else ...[
+              SpecialtyRevenueCard(
+                items: data.analytics!.revenueBySpecialty,
+              ),
+              const SizedBox(height: 12),
+              AttendanceRateCard(
+                metrics: data.analytics!.attendance,
+              ),
+              const SizedBox(height: 12),
+              FinancialBalanceCard(
+                financials: data.analytics!.financials,
+              ),
+            ],
           ],
         ],
       ),

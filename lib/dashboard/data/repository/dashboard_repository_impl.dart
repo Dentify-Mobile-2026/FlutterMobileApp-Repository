@@ -32,6 +32,33 @@ class DashboardRepositoryImpl implements DashboardRepository {
           duration: appt.duration ?? '',
         ),
       ).toList() ?? [],
+      analytics: response.analytics == null
+          ? null
+          : DashboardAnalytics(
+              month: response.analytics!.month,
+              revenueBySpecialty: response.analytics!.revenueBySpecialty
+                  .map(
+                    (s) => SpecialtyRevenue(
+                      category: s.category,
+                      revenue: s.revenue,
+                      count: s.count,
+                    ),
+                  )
+                  .toList(),
+              attendance: AttendanceMetrics(
+                totalAppointments:
+                    response.analytics!.attendance.totalAppointments,
+                completedCount: response.analytics!.attendance.completedCount,
+                cancelledCount: response.analytics!.attendance.cancelledCount,
+                noShowCount: response.analytics!.attendance.noShowCount,
+                attendanceRate: response.analytics!.attendance.attendanceRate,
+              ),
+              financials: FinancialSummary(
+                totalCollected: response.analytics!.financials.totalCollected,
+                pendingBalance: response.analytics!.financials.pendingBalance,
+                collectionRate: response.analytics!.financials.collectionRate,
+              ),
+            ),
     );
   }
 }
