@@ -409,7 +409,14 @@ void main() {
           find.text('No se pudieron cargar los métodos de pago.'),
           findsOneWidget,
         );
-        expect(find.byType(ChoiceChip), findsNothing);
+        // Los filtros de la lista (detrás del diálogo) también son ChoiceChips.
+        expect(
+          find.descendant(
+            of: find.byType(InvoiceFormDialog),
+            matching: find.byType(ChoiceChip),
+          ),
+          findsNothing,
+        );
 
         h.methods.fail = false;
         await tester.tap(find.text('Reintentar'));

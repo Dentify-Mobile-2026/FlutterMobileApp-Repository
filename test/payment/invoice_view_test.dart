@@ -79,7 +79,10 @@ void main() {
     expect(find.text('Ana Torres'), findsOneWidget);
     expect(find.text('Tarjeta de crédito'), findsOneWidget);
     expect(find.text('S/. 120.50'), findsOneWidget);
-    expect(find.text('1 comprobante · Total S/. 120.50'), findsOneWidget);
+    expect(
+      find.text('1 comprobante · Recaudado S/. 120.50 · Por cobrar S/. 0.00'),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -88,7 +91,10 @@ void main() {
     await _pumpView(tester, _ScriptedInvoiceRepository([<Invoice>[]]));
 
     expect(find.text('Aún no hay comprobantes registrados'), findsOneWidget);
-    expect(find.text('0 comprobantes · Total S/. 0.00'), findsOneWidget);
+    expect(
+      find.text('0 comprobantes · Recaudado S/. 0.00 · Por cobrar S/. 0.00'),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 }
