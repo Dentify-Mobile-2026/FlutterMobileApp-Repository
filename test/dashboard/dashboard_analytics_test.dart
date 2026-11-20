@@ -82,8 +82,8 @@ void main() {
         ),
         financials: FinancialSummary(
           totalCollected: 650.0,
-          pendingBalance: 150.0,
-          collectionRate: 81.3,
+          pendingBalance: 175.0,
+          collectionRate: 78.8,
         ),
       ),
     );
@@ -104,7 +104,7 @@ void main() {
       expect(find.text('Ingresos por Especialidad (Mes)'), findsOneWidget);
       expect(find.text('70.0%'), findsOneWidget);
       expect(find.text('S/. 650.00'), findsOneWidget);
-      expect(find.text('S/. 150.00'), findsOneWidget);
+      expect(find.text('S/. 175.00'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
