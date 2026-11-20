@@ -1,18 +1,36 @@
-//import '../../domain/usecases/add_invoice_use_case.dart';
-//import '../../domain/usecases/get_all_invoices_use_case.dart';
-import '../../presentation/viewmodel/invoice_form_view_model.dart';
-import '../../presentation/viewmodel/invoice_view_model.dart';
-import '../../data/di/data_module.dart';
+import 'package:dentify_flutter/payment/data/di/dependency_injection.dart';
+import 'package:dentify_flutter/payment/domain/model/invoice.dart';
+import 'package:dentify_flutter/payment/domain/model/payment_method.dart';
+import 'package:dentify_flutter/payment/domain/usecases/create_invoice_use_case.dart';
+import 'package:dentify_flutter/payment/domain/usecases/get_all_invoices_use_case.dart';
+import 'package:dentify_flutter/payment/domain/usecases/get_all_payment_methods_use_case.dart';
+import 'package:dentify_flutter/payment/presentation/viewmodel/invoice_view_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class PresentationModule {
-  static InvoiceViewModel getInvoicesViewModel() {
-    return InvoiceViewModel(DataModule.getAllInvoicesUseCase());
-  }
+final getAllInvoicesUseCaseProvider = Provider<GetAllInvoicesUseCase>((ref) {
+  return GetAllInvoicesUseCase(ref.read(invoiceRepositoryProvider));
+});
 
-  static InvoiceFormViewModel getInvoiceFormViewModel() {
-    return InvoiceFormViewModel(
-      DataModule.addInvoiceUseCase(),
-      DataModule.getAllAppointmentsFormInfoUseCase(),
-    );
-  }
-}
+final createInvoiceUseCaseProvider = Provider<CreateInvoiceUseCase>((ref) {
+  return CreateInvoiceUseCase(ref.read(invoiceRepositoryProvider));
+});
+
+final getAllPaymentMethodsUseCaseProvider =
+    Provider<GetAllPaymentMethodsUseCase>((ref) {
+  return GetAllPaymentMethodsUseCase(ref.read(paymentMethodRepositoryProvider));
+});
+
+/// Métodos de pago del backend. Se libera al cerrar el formulario para volver a
+/// consultarse (y reintentarse) la próxima vez.
+final paymentMethodsProvider =
+    FutureProvider.autoDispose<List<PaymentMethod>>((ref) {
+  return ref.read(getAllPaymentMethodsUseCaseProvider)();
+});
+
+final invoicesViewModelProvider =
+    StateNotifierProvider<InvoiceViewModel, AsyncValue<List<Invoice>>>((ref) {
+  return InvoiceViewModel(
+    ref.read(getAllInvoicesUseCaseProvider),
+    ref.read(createInvoiceUseCaseProvider),
+  );
+});

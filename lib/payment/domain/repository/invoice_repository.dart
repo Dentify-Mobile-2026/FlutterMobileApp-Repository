@@ -1,7 +1,7 @@
-import '../../data/remote/dto/add_invoice_request.dart';
-import '../../domain/model/invoice.dart';
+import 'package:dentify_flutter/payment/domain/model/invoice.dart';
+import 'package:dentify_flutter/payment/domain/model/new_invoice.dart';
 
 abstract class InvoiceRepository {
-  Future<List<Invoice>> getAllInvoices();
-  Future<void> addInvoice(AddInvoiceRequest addInvoiceRequest);
+  Future<List<Invoice>> getAll();
+  Future<void> create(NewInvoice invoice);
 }
