@@ -1,4 +1,11 @@
 import 'package:dentify_flutter/core/theme/app_theme.dart';
+import 'package:dentify_flutter/core/utils/whatsapp_helper.dart';
+import 'package:dentify_flutter/iam/presentation/di/presentation_module.dart'
+    as iam_di;
+import 'package:dentify_flutter/patientAttention/appointments/domain/model/appointment.dart';
+import 'package:dentify_flutter/patientAttention/appointments/domain/model/appointment_status.dart';
+import 'package:dentify_flutter/patientAttention/appointments/presentation/di/presentation_module.dart'
+    as appts_di;
 import 'package:dentify_flutter/patientAttention/patients/data/remote/dto/update_patient_request.dart';
 import 'package:dentify_flutter/patientAttention/patients/domain/model/patient.dart';
 import 'package:dentify_flutter/patientAttention/patients/presentation/di/presentation_module.dart';
@@ -6,6 +13,7 @@ import 'package:dentify_flutter/patientAttention/patients/presentation/view/medi
 import 'package:dentify_flutter/patientAttention/patients/presentation/widgets/patient_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class PatientCard extends ConsumerWidget {
   const PatientCard({super.key, required this.patient});
@@ -235,32 +243,54 @@ class PatientCard extends ConsumerWidget {
             ),
 
             const SizedBox(height: 14),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                FilledButton.tonalIcon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.mint,
-                    foregroundColor: AppColors.primaryDark,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Wrap(
+                alignment: WrapAlignment.end,
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.success,
+                      side: const BorderSide(color: AppColors.successBorder),
+                      backgroundColor: AppColors.successLight,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () => _onSendWhatsApp(context, ref),
+                    icon: const Icon(Icons.chat_outlined, size: 17),
+                    label: const Text(
+                      'WhatsApp',
+                      style: TextStyle(fontWeight: FontWeight.w700),
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => MedicalHistoriesView(patient: patient),
+                  FilledButton.tonalIcon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.mint,
+                      foregroundColor: AppColors.primaryDark,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.folder_shared_outlined, size: 18),
-                  label: const Text(
-                    'Historial Clínico',
-                    style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              MedicalHistoriesView(patient: patient),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.folder_shared_outlined, size: 18),
+                    label: const Text(
+                      'Historial Clínico',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -312,6 +342,83 @@ class PatientCard extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _onSendWhatsApp(BuildContext context, WidgetRef ref) async {
+    final phone = patient.phone.trim();
+    if (phone.isEmpty) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text('El paciente no tiene un número de teléfono registrado.'),
+            backgroundColor: AppColors.warning,
+          ),
+        );
+      }
+      return;
+    }
+
+    if (ref.read(iam_di.profileViewModelProvider).userInfo == null) {
+      try {
+        await ref
+            .read(iam_di.profileViewModelProvider.notifier)
+            .fetchUserInfo();
+      } catch (_) {}
+    }
+    final clinicName =
+        ref.read(iam_di.profileViewModelProvider).userInfo?.companyName ??
+            'Dentify';
+
+    final appointments = ref.read(appts_di.appointmentsViewModelProvider);
+    final now = DateTime.now();
+    final patientAppts = appointments
+        .where((a) =>
+            a.dni == patient.dni &&
+            a.statusEnum != AppointmentStatus.cancelled &&
+            a.statusEnum != AppointmentStatus.noShow)
+        .toList()
+      ..sort((a, b) => (a.startDateTime ?? DateTime(2100))
+          .compareTo(b.startDateTime ?? DateTime(2100)));
+
+    Appointment? nextAppt;
+    for (final a in patientAppts) {
+      final dt = a.startDateTime;
+      if (dt != null && !dt.isBefore(now)) {
+        nextAppt = a;
+        break;
+      }
+    }
+    nextAppt ??= patientAppts.isNotEmpty ? patientAppts.last : null;
+
+    final dt = nextAppt?.startDateTime;
+    final dateLabel =
+        dt != null ? DateFormat('dd/MM/yyyy').format(dt) : 'por confirmar';
+    final timeLabel =
+        dt != null ? DateFormat('hh:mm a').format(dt) : 'por confirmar';
+    final treatmentLabel = nextAppt != null
+        ? (nextAppt.treatmentName.trim().isNotEmpty
+            ? nextAppt.treatmentName.trim()
+            : nextAppt.reason.trim())
+        : 'Evaluación odontológica';
+
+    final opened = await WhatsAppHelper.openAppointmentReminder(
+      phone: phone,
+      patientName: patient.fullName,
+      appointmentDate: dateLabel,
+      appointmentTime: timeLabel,
+      treatment: treatmentLabel,
+      clinicName: clinicName,
+    );
+
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No se pudo abrir WhatsApp en este dispositivo.'),
+          backgroundColor: AppColors.danger,
+        ),
+      );
+    }
   }
 
   Future<void> _onEdit(BuildContext context, WidgetRef ref) async {

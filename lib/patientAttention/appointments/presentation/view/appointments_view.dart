@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:dentify_flutter/core/theme/app_theme.dart';
+import 'package:dentify_flutter/core/utils/whatsapp_helper.dart';
+import 'package:dentify_flutter/iam/presentation/di/presentation_module.dart'
+    as iam_di;
 import 'package:dentify_flutter/main.dart';
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/add_appointment_request.dart';
 import 'package:dentify_flutter/patientAttention/appointments/data/remote/dto/update_appointment_request.dart';
@@ -12,6 +15,8 @@ import 'package:dentify_flutter/patientAttention/appointments/presentation/widge
 import 'package:dentify_flutter/patientAttention/appointments/presentation/widgets/appointment_status_dialog.dart';
 import 'package:dentify_flutter/patientAttention/appointments/presentation/widgets/dynamic_appointment_calendar.dart';
 import 'package:dentify_flutter/patientAttention/appointments/presentation/widgets/edit_appointment_form.dart';
+import 'package:dentify_flutter/patientAttention/patients/presentation/di/presentation_module.dart'
+    as patients_di;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -406,55 +411,73 @@ class _AppointmentsViewState extends ConsumerState<AppointmentsView>
             ),
           ],
           const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              if (st == AppointmentStatus.inProgress)
-                TextButton(
+          Align(
+            alignment: Alignment.centerRight,
+            child: Wrap(
+              alignment: WrapAlignment.end,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 4,
+              runSpacing: 4,
+              children: [
+                TextButton.icon(
                   style: TextButton.styleFrom(
                     foregroundColor: AppColors.success,
                     visualDensity: VisualDensity.compact,
                   ),
-                  onPressed: () => _quickChangeStatus(
-                    parentContext,
-                    appt,
-                    AppointmentStatus.completed,
+                  onPressed: () => _sendWhatsAppReminder(parentContext, appt),
+                  icon: const Icon(Icons.chat_outlined, size: 15),
+                  label: const Text('WhatsApp', style: TextStyle(fontSize: 12)),
+                ),
+                if (st == AppointmentStatus.inProgress)
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.success,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    onPressed: () => _quickChangeStatus(
+                      parentContext,
+                      appt,
+                      AppointmentStatus.completed,
+                    ),
+                    child:
+                        const Text('Atendida', style: TextStyle(fontSize: 12)),
                   ),
-                  child: const Text('Atendida', style: TextStyle(fontSize: 12)),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(sheetContext);
+                    _openStatusDialog(parentContext, appt);
+                  },
+                  child:
+                      const Text('Evolución', style: TextStyle(fontSize: 12)),
                 ),
-              TextButton(
-                style: TextButton.styleFrom(
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.muted,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(sheetContext);
+                    _onEdit(parentContext, appt);
+                  },
+                  child:
+                      const Text('Reprogramar', style: TextStyle(fontSize: 12)),
+                ),
+                IconButton(
+                  tooltip: 'Eliminar cita',
                   visualDensity: VisualDensity.compact,
+                  iconSize: 17,
+                  icon:
+                      const Icon(Icons.delete_outline, color: AppColors.muted),
+                  onPressed: () {
+                    Navigator.pop(sheetContext);
+                    _onDelete(parentContext, appt);
+                  },
                 ),
-                onPressed: () {
-                  Navigator.pop(sheetContext);
-                  _openStatusDialog(parentContext, appt);
-                },
-                child: const Text('Evolución', style: TextStyle(fontSize: 12)),
-              ),
-              TextButton(
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.muted,
-                  visualDensity: VisualDensity.compact,
-                ),
-                onPressed: () {
-                  Navigator.pop(sheetContext);
-                  _onEdit(parentContext, appt);
-                },
-                child:
-                    const Text('Reprogramar', style: TextStyle(fontSize: 12)),
-              ),
-              IconButton(
-                tooltip: 'Eliminar cita',
-                visualDensity: VisualDensity.compact,
-                iconSize: 17,
-                icon: const Icon(Icons.delete_outline, color: AppColors.muted),
-                onPressed: () {
-                  Navigator.pop(sheetContext);
-                  _onDelete(parentContext, appt);
-                },
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -654,6 +677,70 @@ class _AppointmentsViewState extends ConsumerState<AppointmentsView>
         ],
       ),
     );
+  }
+
+  Future<void> _sendWhatsAppReminder(
+      BuildContext context, Appointment appt) async {
+    String phone = appt.patientPhone.trim();
+    if (phone.isEmpty) {
+      final patients = ref.read(patients_di.patientsViewModelProvider);
+      for (final p in patients) {
+        if (p.dni == appt.dni && p.phone.trim().isNotEmpty) {
+          phone = p.phone.trim();
+          break;
+        }
+      }
+    }
+
+    if (phone.isEmpty) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text('El paciente no tiene un número de teléfono registrado.'),
+            backgroundColor: AppColors.warning,
+          ),
+        );
+      }
+      return;
+    }
+
+    if (ref.read(iam_di.profileViewModelProvider).userInfo == null) {
+      try {
+        await ref
+            .read(iam_di.profileViewModelProvider.notifier)
+            .fetchUserInfo();
+      } catch (_) {}
+    }
+    final clinicName =
+        ref.read(iam_di.profileViewModelProvider).userInfo?.companyName ??
+            'Dentify';
+
+    final dt = appt.startDateTime;
+    final dateLabel =
+        dt != null ? DateFormat('dd/MM/yyyy').format(dt) : appt.appointmentDate;
+    final timeLabel = formatTimeOnly(appt.appointmentDate);
+    final treatmentLabel = appt.treatmentName.trim().isNotEmpty
+        ? appt.treatmentName.trim()
+        : appt.reason.trim();
+
+    final opened = await WhatsAppHelper.openAppointmentReminder(
+      phone: phone,
+      patientName: appt.patientName,
+      appointmentDate: dateLabel,
+      appointmentTime: timeLabel,
+      treatment: treatmentLabel,
+      clinicName: clinicName,
+    );
+
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No se pudo abrir WhatsApp en este dispositivo.'),
+          backgroundColor: AppColors.danger,
+        ),
+      );
+    }
   }
 
   Future<void> _onAddAppointment(
