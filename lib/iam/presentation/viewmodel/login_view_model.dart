@@ -18,6 +18,10 @@ class LoginViewModel extends StateNotifier<Login?> {
   // Función de login que usa username y password
   Future<void> login() async {
     errorMessage = null;
+    if (username.trim().isEmpty || password.isEmpty) {
+      errorMessage = 'Ingresa tu usuario y tu contraseña.';
+      return;
+    }
     try {
       final result = await loginUseCase(username, password);
 
