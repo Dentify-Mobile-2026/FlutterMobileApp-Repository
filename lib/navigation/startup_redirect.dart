@@ -1,8 +1,13 @@
+import 'package:dentify_flutter/core/network/api_constants.dart';
+import 'package:dentify_flutter/iam/data/remote/services/session_validator.dart';
 import 'package:dentify_flutter/iam/data/storage/token_storage.dart';
 import 'package:flutter/material.dart';
 
 class StartupRedirect extends StatefulWidget {
-  const StartupRedirect({super.key});
+  /// Se puede inyectar en pruebas; por defecto valida contra el servicio configurado.
+  final SessionValidator? validator;
+
+  const StartupRedirect({super.key, this.validator});
 
   @override
   State<StartupRedirect> createState() => _StartupRedirectState();
@@ -16,15 +21,18 @@ class _StartupRedirectState extends State<StartupRedirect> {
   }
 
   Future<void> _checkAuthAndRedirect() async {
-    final hasToken = await TokenStorage.hasValidToken();
+    final token = await TokenStorage.getAccessToken();
+    var goHome = false;
+
+    if (token != null && token.isNotEmpty) {
+      // Un token guardado puede haber vencido o pertenecer a otra base: se valida antes de entrar.
+      final validator = widget.validator ?? SessionValidator(ApiConstants.baseUrl);
+      goHome = await validator.check(token) != SessionStatus.invalid;
+      if (!goHome) await TokenStorage.clearTokens();
+    }
 
     if (!mounted) return;
-
-    if (hasToken) {
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      Navigator.pushReplacementNamed(context, '/login');
-    }
+    Navigator.pushReplacementNamed(context, goHome ? '/home' : '/login');
   }
 
   @override
@@ -34,4 +42,3 @@ class _StartupRedirectState extends State<StartupRedirect> {
     );
   }
 }
-
