@@ -2,6 +2,7 @@ import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:dentify_flutter/inventory/data/remote/dto/item_request.dart';
 import 'package:dentify_flutter/inventory/presentation/di/presentation_module.dart';
 import 'package:dentify_flutter/inventory/presentation/widgets/item_form.dart';
+import 'package:dentify_flutter/inventory/presentation/widgets/stock_movements_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -32,6 +33,18 @@ class _ItemsViewState extends ConsumerState<ItemsView> {
         .join(' ');
   }
 
+  void _openMovementsModal(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => const StockMovementsModal(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final allItems = ref.watch(itemsViewModelProvider);
@@ -50,60 +63,90 @@ class _ItemsViewState extends ConsumerState<ItemsView> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Inventario',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.ink,
-                          letterSpacing: -0.3,
-                        ),
+            child: SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 12,
+                runSpacing: 8,
+                children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Inventario',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.ink,
+                        letterSpacing: -0.3,
                       ),
-                      Text(
-                        '${allItems.length} insumos registrados',
-                        style: const TextStyle(
-                            fontSize: 12.5, color: AppColors.muted),
+                    ),
+                    Text(
+                      '${allItems.length} insumos registrados',
+                      style: const TextStyle(
+                          fontSize: 12.5, color: AppColors.muted),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      tooltip: 'Actualizar inventario',
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () =>
+                          ref.read(itemsViewModelProvider.notifier).getAllItems(),
+                      icon: const Icon(Icons.refresh_rounded,
+                          color: AppColors.muted),
+                    ),
+                    const SizedBox(width: 4),
+                    OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primaryDark,
+                        backgroundColor: AppColors.surface,
+                        side: const BorderSide(color: AppColors.border),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 8),
                       ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  tooltip: 'Actualizar inventario',
-                  onPressed: () =>
-                      ref.read(itemsViewModelProvider.notifier).getAllItems(),
-                  icon:
-                      const Icon(Icons.refresh_rounded, color: AppColors.muted),
-                ),
-                const SizedBox(width: 6),
-                FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-                  ),
-                  onPressed: () async {
-                    final result = await showDialog<Map<String, dynamic>>(
-                      context: context,
-                      builder: (context) => const ItemFormDialog(),
-                    );
-                    if (result != null && result.containsKey('new')) {
-                      final newItem = result['new'] as ItemRequest;
-                      await ref
-                          .read(itemsViewModelProvider.notifier)
-                          .addItem(newItem);
-                      ref.read(itemsViewModelProvider.notifier).getAllItems();
-                    }
-                  },
-                  icon: const Icon(Icons.add, size: 17),
-                  label: const Text('Nuevo', style: TextStyle(fontSize: 13)),
+                      onPressed: () => _openMovementsModal(context),
+                      icon: const Icon(Icons.history_rounded, size: 16),
+                      label: const Text('Movimientos',
+                          style: TextStyle(fontSize: 12.5)),
+                    ),
+                    const SizedBox(width: 6),
+                    FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 9),
+                      ),
+                      onPressed: () async {
+                        final result = await showDialog<Map<String, dynamic>>(
+                          context: context,
+                          builder: (context) => const ItemFormDialog(),
+                        );
+                        if (result != null && result.containsKey('new')) {
+                          final newItem = result['new'] as ItemRequest;
+                          await ref
+                              .read(itemsViewModelProvider.notifier)
+                              .addItem(newItem);
+                          ref
+                              .read(itemsViewModelProvider.notifier)
+                              .getAllItems();
+                        }
+                      },
+                      icon: const Icon(Icons.add, size: 17),
+                      label: const Text('Nuevo',
+                          style: TextStyle(fontSize: 13)),
+                    ),
+                  ],
                 ),
               ],
+            ),
             ),
           ),
           Padding(
