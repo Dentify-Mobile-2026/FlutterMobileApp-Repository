@@ -61,10 +61,10 @@ PaymentApiException paymentApiExceptionFrom(http.Response response) {
 String _defaultMessage(int status) {
   if (status == 400) return 'Los datos enviados no son válidos.';
   if (status == 401 || status == 403) {
-    return 'Tu sesión expiró o no tienes permisos. Inicia sesión nuevamente.';
+    return 'Su sesión expiró o no tiene permisos. Inicie sesión nuevamente.';
   }
   if (status == 404) return 'No se encontró el recurso solicitado.';
   if (status == 409) return 'La cita ya tiene un comprobante registrado.';
-  if (status >= 500) return 'Error del servidor. Intenta nuevamente en unos minutos.';
+  if (status >= 500) return 'Error del servidor. Intente nuevamente en unos minutos.';
   return 'No se pudo completar la operación (HTTP $status).';
 }

@@ -1,5 +1,9 @@
+import 'package:dentify_flutter/patientAttention/appointments/domain/model/appointment.dart';
+import 'package:dentify_flutter/patientAttention/appointments/presentation/di/presentation_module.dart'
+    as appointments_di;
 import 'package:dentify_flutter/payment/data/di/dependency_injection.dart';
 import 'package:dentify_flutter/payment/domain/model/invoice.dart';
+import 'package:dentify_flutter/payment/domain/model/invoice_eligibility.dart';
 import 'package:dentify_flutter/payment/domain/model/payment_method.dart';
 import 'package:dentify_flutter/payment/domain/usecases/create_invoice_use_case.dart';
 import 'package:dentify_flutter/payment/domain/usecases/get_all_invoices_use_case.dart';
@@ -32,5 +36,16 @@ final invoicesViewModelProvider =
   return InvoiceViewModel(
     ref.read(getAllInvoicesUseCaseProvider),
     ref.read(createInvoiceUseCaseProvider),
+  );
+});
+
+/// Citas del módulo de agenda (solo lectura) que aún se pueden cobrar.
+final invoiceableAppointmentsProvider = Provider<List<Appointment>>((ref) {
+  final appointments = ref.watch(appointments_di.appointmentsViewModelProvider);
+  final invoices =
+      ref.watch(invoicesViewModelProvider).valueOrNull ?? const <Invoice>[];
+  return invoiceableAppointments(
+    appointments,
+    invoices.map((invoice) => invoice.appointmentId),
   );
 });

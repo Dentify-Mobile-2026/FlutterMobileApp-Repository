@@ -3,6 +3,7 @@ import 'package:dentify_flutter/payment/domain/model/invoice.dart';
 import 'package:dentify_flutter/payment/domain/model/money.dart';
 import 'package:dentify_flutter/payment/domain/model/payment_api_exception.dart';
 import 'package:dentify_flutter/payment/presentation/di/presentation_module.dart';
+import 'package:dentify_flutter/payment/presentation/widgets/invoice_form_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -23,6 +24,17 @@ class _InvoiceViewState extends ConsumerState<InvoiceView> {
 
   Future<void> _reload() {
     return ref.read(invoicesViewModelProvider.notifier).load();
+  }
+
+  Future<void> _openInvoiceForm() async {
+    final created = await showDialog<bool>(
+      context: context,
+      builder: (_) => const InvoiceFormDialog(),
+    );
+    if (!mounted || created != true) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Cobro registrado correctamente')),
+    );
   }
 
   @override
@@ -73,6 +85,19 @@ class _InvoiceViewState extends ConsumerState<InvoiceView> {
                         icon: const Icon(Icons.refresh_rounded,
                             color: AppColors.muted),
                       ),
+                      const SizedBox(width: 6),
+                      FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 9),
+                        ),
+                        onPressed: _openInvoiceForm,
+                        icon: const Icon(Icons.add, size: 17),
+                        label: const Text('Nuevo',
+                            style: TextStyle(fontSize: 13)),
+                      ),
                     ],
                   ),
                 ],
@@ -119,7 +144,7 @@ class _InvoiceViewState extends ConsumerState<InvoiceView> {
 
   String _describeError(Object error) {
     if (error is PaymentApiException) return error.message;
-    return 'Revisa tu conexión e inténtalo nuevamente.';
+    return 'Revise su conexión e intente nuevamente.';
   }
 }
 
