@@ -255,6 +255,24 @@ void main() {
         expect(find.byType(InvoiceFormDialog), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
+
+      testWidgets('clears the error as soon as the initial payment is fixed',
+          (tester) async {
+        final repo = await _openForm(tester, size);
+
+        await _enter(tester, _initial, '350.01');
+        await _selectMethod(tester, 'Efectivo');
+        await _tapSubmit(tester);
+        const error =
+            'El abono inicial no puede superar el monto total (S/. 350.00)';
+        expect(find.text(error), findsOneWidget);
+
+        await _enter(tester, _initial, '350');
+
+        expect(find.text(error), findsNothing);
+        expect(repo.created, isEmpty);
+        expect(tester.takeException(), isNull);
+      });
     });
   }
 }

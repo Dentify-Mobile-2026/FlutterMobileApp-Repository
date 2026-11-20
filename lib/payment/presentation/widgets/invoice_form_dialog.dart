@@ -72,6 +72,10 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
   bool _showMethodError = false;
   String? _submitError;
 
+  /// Tras el primer intento inválido, el formulario se revalida mientras se
+  /// edita: los errores desaparecen en cuanto los datos vuelven a ser válidos.
+  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
+
   @override
   void initState() {
     super.initState();
@@ -187,6 +191,7 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
     setState(() {
       _showMethodError = methodRequired && methodId == null;
       _submitError = null;
+      if (!formValid) _autovalidateMode = AutovalidateMode.onUserInteraction;
     });
     if (!formValid ||
         appointmentId == null ||
@@ -261,6 +266,7 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
             padding: const EdgeInsets.all(24),
             child: Form(
               key: _formKey,
+              autovalidateMode: _autovalidateMode,
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,

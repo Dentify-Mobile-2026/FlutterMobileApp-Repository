@@ -71,6 +71,10 @@ class _RegisterPaymentDialogState extends ConsumerState<RegisterPaymentDialog> {
   String? _submitError;
   _PaymentAttempt? _lastAttempt;
 
+  /// Tras el primer intento inválido, el formulario se revalida mientras se
+  /// edita: el error desaparece en cuanto el monto vuelve a ser válido.
+  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
+
   @override
   void initState() {
     super.initState();
@@ -145,6 +149,7 @@ class _RegisterPaymentDialogState extends ConsumerState<RegisterPaymentDialog> {
     setState(() {
       _showMethodError = methodId == null;
       _submitError = null;
+      if (!formValid) _autovalidateMode = AutovalidateMode.onUserInteraction;
     });
     if (!formValid || methodId == null) return;
 
@@ -205,6 +210,7 @@ class _RegisterPaymentDialogState extends ConsumerState<RegisterPaymentDialog> {
             padding: const EdgeInsets.all(24),
             child: Form(
               key: _formKey,
+              autovalidateMode: _autovalidateMode,
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,

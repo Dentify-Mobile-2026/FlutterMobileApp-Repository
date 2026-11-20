@@ -140,6 +140,26 @@ void main() {
         expect(tester.takeException(), isNull);
       });
 
+      testWidgets('clears the amount error as soon as the amount is fixed',
+          (tester) async {
+        final repo = FakePaymentsInvoiceRepository([_partialInvoice()]);
+        await _openDialog(tester, size, repo);
+
+        await _enterAmount(tester, '600.01');
+        await _selectMethod(tester, 'Efectivo');
+        await _tapSubmit(tester);
+        await tester.pumpAndSettle();
+        const error =
+            'El abono no puede superar el saldo pendiente (máximo S/. 600.00)';
+        expect(find.text(error), findsOneWidget);
+
+        await _enterAmount(tester, '600.00');
+
+        expect(find.text(error), findsNothing);
+        expect(repo.registered, isEmpty);
+        expect(tester.takeException(), isNull);
+      });
+
       testWidgets('requires a payment method', (tester) async {
         final repo = FakePaymentsInvoiceRepository([_partialInvoice()]);
         await _openDialog(tester, size, repo);
