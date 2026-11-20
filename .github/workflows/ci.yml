@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-    branches: [main]
+    branches: [main, payments]
   pull_request:
 jobs:
   flutter:
@@ -11,6 +11,9 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # Misma versión validada localmente; el build Android del proyecto (AGP 8.11) no
+          # es compatible con Flutter 3.50+, que exige AGP 9.
+          flutter-version: 3.47.9
       - run: flutter pub get
       - run: flutter analyze --no-fatal-infos
       - run: flutter test

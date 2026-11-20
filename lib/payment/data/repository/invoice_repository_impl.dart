@@ -1,32 +1,41 @@
-import '../../data/remote/services/invoice_service.dart';
-import '../../domain/model/invoice.dart';
-import '../../domain/repository/invoice_repository.dart';
-import '../../data/remote/dto/add_invoice_request.dart';
+import 'package:dentify_flutter/payment/data/remote/dto/create_invoice_request.dart';
+import 'package:dentify_flutter/payment/data/remote/dto/register_payment_request.dart';
+import 'package:dentify_flutter/payment/data/remote/services/invoice_service.dart';
+import 'package:dentify_flutter/payment/domain/model/invoice.dart';
+import 'package:dentify_flutter/payment/domain/model/invoice_payment.dart';
+import 'package:dentify_flutter/payment/domain/model/new_invoice.dart';
+import 'package:dentify_flutter/payment/domain/model/register_payment.dart';
+import 'package:dentify_flutter/payment/domain/repository/invoice_repository.dart';
 
-//import 'package:dio/dio.dart';
-
+/// No captura errores: la capa de presentación decide cómo mostrarlos.
 class InvoiceRepositoryImpl implements InvoiceRepository {
   final InvoiceService invoiceService;
 
   InvoiceRepositoryImpl(this.invoiceService);
 
   @override
-  Future<List<Invoice>> getAllInvoices() async {
-    try {
-      final response = await invoiceService.getAllInvoices();
-      return response.map((e) => e.toDomain()).toList();
-    } catch (e) {
-      print("Error fetching invoices: $e");
-      return [];
-    }
+  Future<List<Invoice>> getAll() async {
+    final responses = await invoiceService.getAllInvoices();
+    return responses.map((r) => r.toDomain()).toList();
   }
 
   @override
-  Future<void> addInvoice(AddInvoiceRequest addInvoiceRequest) async {
-    try {
-      await invoiceService.addInvoice(addInvoiceRequest);
-    } catch (e) {
-      print("Error adding invoice: $e");
-    }
+  Future<void> create(NewInvoice invoice) {
+    return invoiceService.createInvoice(CreateInvoiceRequest.fromDomain(invoice));
+  }
+
+  @override
+  Future<List<InvoicePayment>> getPayments(int invoiceId) async {
+    final responses = await invoiceService.getInvoicePayments(invoiceId);
+    return responses.map((r) => r.toDomain()).toList();
+  }
+
+  @override
+  Future<Invoice> registerPayment(int invoiceId, RegisterPayment payment) async {
+    final response = await invoiceService.registerPayment(
+      invoiceId,
+      RegisterPaymentRequest.fromDomain(payment),
+    );
+    return response.toDomain();
   }
 }
