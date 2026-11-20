@@ -10,12 +10,14 @@ class AppointmentStatusDialog extends StatefulWidget {
   const AppointmentStatusDialog({super.key, required this.appointment});
 
   @override
-  State<AppointmentStatusDialog> createState() => _AppointmentStatusDialogState();
+  State<AppointmentStatusDialog> createState() =>
+      _AppointmentStatusDialogState();
 }
 
 class _AppointmentStatusDialogState extends State<AppointmentStatusDialog> {
   late AppointmentStatus _selectedStatus;
   late TextEditingController _notesController;
+  bool _recordInMedicalHistory = false;
 
   @override
   void initState() {
@@ -87,7 +89,6 @@ class _AppointmentStatusDialogState extends State<AppointmentStatusDialog> {
                   ],
                 ),
                 const Divider(height: 26),
-
                 const Text(
                   'Estado de la Cita:',
                   style: TextStyle(
@@ -128,7 +129,6 @@ class _AppointmentStatusDialogState extends State<AppointmentStatusDialog> {
                   }).toList(),
                 ),
                 const SizedBox(height: 20),
-
                 const Text(
                   'Notas Clínicas / Evolución de la Sesión:',
                   style: TextStyle(
@@ -141,15 +141,31 @@ class _AppointmentStatusDialogState extends State<AppointmentStatusDialog> {
                 TextField(
                   controller: _notesController,
                   maxLines: 4,
+                  maxLength: 500,
                   decoration: const InputDecoration(
                     hintText:
                         'Registra qué procedimiento se realizó, piezas tratadas, anestesia aplicada o indicaciones...',
                   ),
                 ),
+                if (_selectedStatus == AppointmentStatus.completed)
+                  SwitchListTile.adaptive(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text(
+                        'Registrar automáticamente en el Historial Médico'),
+                    subtitle: widget.appointment.treatmentId == null
+                        ? const Text(
+                            'La cita debe tener un tratamiento vinculado.')
+                        : null,
+                    value: _recordInMedicalHistory,
+                    onChanged: widget.appointment.treatmentId == null
+                        ? null
+                        : (value) =>
+                            setState(() => _recordInMedicalHistory = value),
+                  ),
                 const SizedBox(height: 24),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                Wrap(
+                  alignment: WrapAlignment.end,
+                  runSpacing: 8,
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
@@ -161,6 +177,9 @@ class _AppointmentStatusDialogState extends State<AppointmentStatusDialog> {
                         final req = UpdateAppointmentStatusRequest(
                           status: _selectedStatus.code,
                           clinicalNotes: _notesController.text.trim(),
+                          recordInMedicalHistory:
+                              _selectedStatus == AppointmentStatus.completed &&
+                                  _recordInMedicalHistory,
                         );
                         Navigator.pop(context, req);
                       },
