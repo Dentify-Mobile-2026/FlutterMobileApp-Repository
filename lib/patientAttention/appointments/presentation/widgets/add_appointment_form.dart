@@ -39,6 +39,12 @@ class _AddAppointmentFormState extends ConsumerState<AddAppointmentForm> {
   void initState() {
     super.initState();
     selectedDate = widget.initialDate ?? DateTime.now();
+    Future.microtask(() {
+      if (!mounted) return;
+      if (ref.read(treatmentsViewModelProvider).isEmpty) {
+        ref.read(treatmentsViewModelProvider.notifier).getAllTreatments();
+      }
+    });
   }
 
   @override

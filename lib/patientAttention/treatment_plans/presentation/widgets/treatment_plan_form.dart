@@ -32,6 +32,17 @@ class _TreatmentPlanFormState extends ConsumerState<TreatmentPlanForm> {
   String? _error;
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      if (!mounted) return;
+      if (ref.read(treatmentsViewModelProvider).isEmpty) {
+        ref.read(treatmentsViewModelProvider.notifier).getAllTreatments();
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _title.dispose();
     _notes.dispose();
