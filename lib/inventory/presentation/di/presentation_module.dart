@@ -1,10 +1,13 @@
 import 'package:dentify_flutter/inventory/data/di/dependency_injection.dart';
 import 'package:dentify_flutter/inventory/domain/model/item.dart';
+import 'package:dentify_flutter/inventory/domain/model/log_entry.dart';
 import 'package:dentify_flutter/inventory/domain/usecases/add_item_use_case.dart';
 import 'package:dentify_flutter/inventory/domain/usecases/delete_item_use_case.dart';
 import 'package:dentify_flutter/inventory/domain/usecases/get_all_items_use_case.dart';
+import 'package:dentify_flutter/inventory/domain/usecases/get_all_log_entries_use_case.dart';
 import 'package:dentify_flutter/inventory/domain/usecases/update_item_use_case.dart';
 import 'package:dentify_flutter/inventory/presentation/viewmodel/item_view_model.dart';
+import 'package:dentify_flutter/inventory/presentation/viewmodel/log_entry_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final getAllItemsUseCaseProvider = Provider<GetAllItemsUseCase>((ref) {
@@ -30,4 +33,13 @@ final itemsViewModelProvider = StateNotifierProvider<ItemViewModel, List<Item>>(
     ref.read(addItemUseCaseProvider),
     ref.read(updateItemUseCaseProvider),
   );
+});
+
+final getAllLogEntriesUseCaseProvider = Provider<GetAllLogEntriesUseCase>((ref) {
+  return GetAllLogEntriesUseCase(ref.read(logEntryRepositoryProvider));
+});
+
+final logEntriesViewModelProvider =
+    StateNotifierProvider<LogEntryViewModel, AsyncValue<List<LogEntry>>>((ref) {
+  return LogEntryViewModel(ref.read(getAllLogEntriesUseCaseProvider));
 });
