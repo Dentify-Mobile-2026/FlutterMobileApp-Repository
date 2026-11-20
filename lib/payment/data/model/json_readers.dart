@@ -17,3 +17,24 @@ String? readString(Object? value) {
   final text = value is String ? value.trim() : value.toString().trim();
   return text.isEmpty ? null : text;
 }
+
+bool? readBool(Object? value) {
+  if (value is bool) return value;
+  if (value is String) {
+    final text = value.trim().toLowerCase();
+    if (text == 'true') return true;
+    if (text == 'false') return false;
+  }
+  return null;
+}
+
+/// Textos no vacíos de una lista JSON, sin repetidos y en el orden recibido.
+List<String> readStringList(Object? value) {
+  if (value is! List) return const [];
+  final result = <String>[];
+  for (final item in value) {
+    final text = item is String ? readString(item) : null;
+    if (text != null && !result.contains(text)) result.add(text);
+  }
+  return List.unmodifiable(result);
+}
