@@ -11,6 +11,7 @@ import 'package:dentify_flutter/payment/domain/model/payment_api_exception.dart'
 import 'package:dentify_flutter/payment/domain/model/payment_method.dart';
 import 'package:dentify_flutter/payment/presentation/di/presentation_module.dart'
     as payment_di;
+import 'package:dentify_flutter/payment/presentation/widgets/payment_method_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -261,7 +262,7 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
                           id == null ? 'Seleccione la cita a cobrar' : null,
                     ),
                     if (appointmentsFailed)
-                      _InlineRetry(
+                      PaymentInlineRetry(
                         message: 'No se pudieron cargar las citas.',
                         onRetry: () => appointmentsVm.getAllAppointments(),
                       ),
@@ -297,7 +298,18 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    _buildPaymentMethods(methodsState, selectedMethodId),
+                    PaymentMethodPicker(
+                      methodsState: methodsState,
+                      selectedMethodId: selectedMethodId,
+                      enabled: !_isSubmitting,
+                      onSelected: (id) => setState(() {
+                        _selectedMethodId = id;
+                        _showMethodError = false;
+                        _submitError = null;
+                      }),
+                      onRetry: () =>
+                          ref.invalidate(payment_di.paymentMethodsProvider),
+                    ),
                     if (_showMethodError && selectedMethodId == null)
                       const Padding(
                         padding: EdgeInsets.only(top: 6),
@@ -392,73 +404,6 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
     );
   }
 
-  Widget _buildPaymentMethods(
-    AsyncValue<List<PaymentMethod>> methodsState,
-    int? selectedMethodId,
-  ) {
-    return methodsState.when(
-      loading: () => const Row(
-        children: [
-          SizedBox(
-            width: 16,
-            height: 16,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-          SizedBox(width: 10),
-          Flexible(
-            child: Text(
-              'Cargando métodos de pago…',
-              style: TextStyle(fontSize: 12.5, color: AppColors.muted),
-            ),
-          ),
-        ],
-      ),
-      error: (_, __) => _InlineRetry(
-        message: 'No se pudieron cargar los métodos de pago.',
-        onRetry: () => ref.invalidate(payment_di.paymentMethodsProvider),
-      ),
-      data: (methods) {
-        if (methods.isEmpty) {
-          return const Text(
-            'No hay métodos de pago configurados.',
-            style: TextStyle(fontSize: 12.5, color: AppColors.muted),
-          );
-        }
-        return Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final method in methods)
-              ChoiceChip(
-                label: Text(
-                  method.name,
-                  style: TextStyle(
-                    fontWeight: method.id == selectedMethodId
-                        ? FontWeight.w700
-                        : FontWeight.w500,
-                    color: method.id == selectedMethodId
-                        ? AppColors.primaryDark
-                        : AppColors.ink,
-                  ),
-                ),
-                tooltip:
-                    method.description.isNotEmpty ? method.description : null,
-                selected: method.id == selectedMethodId,
-                selectedColor: AppColors.mint,
-                onSelected: _isSubmitting
-                    ? null
-                    : (_) => setState(() {
-                          _selectedMethodId = method.id;
-                          _showMethodError = false;
-                          _submitError = null;
-                        }),
-              ),
-          ],
-        );
-      },
-    );
-  }
-
   Widget _buildSubmitError(String message) {
     return Container(
       margin: const EdgeInsets.only(top: 16),
@@ -490,34 +435,5 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
 
   Widget _singleLine(String text) {
     return Text(text, maxLines: 1, overflow: TextOverflow.ellipsis);
-  }
-}
-
-class _InlineRetry extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-
-  const _InlineRetry({required this.message, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 6),
-      child: Wrap(
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 4,
-        children: [
-          Text(
-            message,
-            style: const TextStyle(fontSize: 12.5, color: AppColors.danger),
-          ),
-          TextButton.icon(
-            onPressed: onRetry,
-            icon: const Icon(Icons.refresh, size: 16),
-            label: const Text('Reintentar'),
-          ),
-        ],
-      ),
-    );
   }
 }
