@@ -4,11 +4,18 @@ import 'package:dentify_flutter/payment/domain/model/money.dart';
 class NewInvoice {
   final int appointmentId;
   final Money amount;
-  final int paymentMethodId;
+
+  /// Obligatorio si hay abono inicial; `null` cuando el abono inicial es 0.
+  final int? paymentMethodId;
+
+  /// Monto cobrado al emitir el comprobante (0 a [amount]). Si es `null`, el
+  /// servidor cobra el total.
+  final Money? initialPayment;
 
   const NewInvoice({
     required this.appointmentId,
     required this.amount,
     required this.paymentMethodId,
+    this.initialPayment,
   });
 }
