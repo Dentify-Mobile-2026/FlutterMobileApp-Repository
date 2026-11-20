@@ -23,6 +23,9 @@ class InvoiceFormDialog extends ConsumerStatefulWidget {
   const InvoiceFormDialog({super.key});
 
   static const submitButtonKey = ValueKey('invoice-form-submit');
+  static const amountFieldKey = ValueKey('invoice-form-amount');
+  static const initialPaymentFieldKey =
+      ValueKey('invoice-form-initial-payment');
 
   /// El monto debe tener formato válido (máx. 2 decimales) y ser mayor a 0.
   static String? validateAmount(String? raw) {
@@ -31,6 +34,20 @@ class InvoiceFormDialog extends ConsumerStatefulWidget {
     final amount = Money.tryParse(text);
     if (amount == null) return 'Ingrese un monto válido (máx. 2 decimales)';
     if (!amount.isPositive) return 'El monto debe ser mayor a 0';
+    return null;
+  }
+
+  /// El abono inicial puede ser 0, debe tener formato válido (máx. 2
+  /// decimales) y no superar el monto total (comparado en céntimos).
+  static String? validateInitialPayment(String? raw, Money? total) {
+    final text = raw?.trim() ?? '';
+    if (text.isEmpty) return 'Ingrese el abono inicial (puede ser 0)';
+    final initial = Money.tryParse(text);
+    if (initial == null) return 'Ingrese un monto válido (máx. 2 decimales)';
+    if (total != null && initial > total) {
+      return 'El abono inicial no puede superar el monto total '
+          '(${total.format()})';
+    }
     return null;
   }
 
@@ -43,10 +60,14 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
 
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
+  final _initialPaymentController = TextEditingController();
 
   int? _selectedAppointmentId;
   int? _selectedMethodId;
   String? _prefilledAmount;
+
+  /// Mientras el usuario no edite el abono inicial, este refleja el total.
+  bool _initialPaymentEdited = false;
   bool _isSubmitting = false;
   bool _showMethodError = false;
   String? _submitError;
@@ -54,13 +75,28 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
   @override
   void initState() {
     super.initState();
+    _amountController.addListener(_mirrorTotalIntoInitialPayment);
     Future.microtask(_refreshSources);
   }
 
   @override
   void dispose() {
+    _amountController.removeListener(_mirrorTotalIntoInitialPayment);
     _amountController.dispose();
+    _initialPaymentController.dispose();
     super.dispose();
+  }
+
+  void _mirrorTotalIntoInitialPayment() {
+    if (_initialPaymentEdited) return;
+    if (_initialPaymentController.text != _amountController.text) {
+      _initialPaymentController.text = _amountController.text;
+    }
+  }
+
+  /// Sin abono inicial no se registra ningún pago y el método no aplica.
+  bool _requiresPaymentMethod(Money? initialPayment) {
+    return initialPayment == null || initialPayment.isPositive;
   }
 
   /// Asegura comprobantes, citas y tratamientos actualizados al abrir el formulario.
@@ -144,13 +180,20 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
         _pickIfPresent(_selectedAppointmentId, eligible.map((a) => a.id));
     final methodId =
         _pickIfPresent(_selectedMethodId, methods.map((m) => m.id));
+    final initialPayment = Money.tryParse(_initialPaymentController.text);
+    final methodRequired = _requiresPaymentMethod(initialPayment);
     final formValid = _formKey.currentState?.validate() ?? false;
 
     setState(() {
-      _showMethodError = methodId == null;
+      _showMethodError = methodRequired && methodId == null;
       _submitError = null;
     });
-    if (!formValid || appointmentId == null || methodId == null) return;
+    if (!formValid ||
+        appointmentId == null ||
+        initialPayment == null ||
+        (methodRequired && methodId == null)) {
+      return;
+    }
 
     final amount = Money.parse(_amountController.text);
     setState(() => _isSubmitting = true);
@@ -160,7 +203,8 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
             NewInvoice(
               appointmentId: appointmentId,
               amount: amount,
-              paymentMethodId: methodId,
+              paymentMethodId: methodRequired ? methodId : null,
+              initialPayment: initialPayment,
             ),
           );
       if (!mounted) return;
@@ -201,6 +245,9 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
       _selectedMethodId,
       (methodsState.valueOrNull ?? const <PaymentMethod>[]).map((m) => m.id),
     );
+    final total = Money.tryParse(_amountController.text);
+    final initialPayment = Money.tryParse(_initialPaymentController.text);
+    final methodRequired = _requiresPaymentMethod(initialPayment);
 
     return PopScope(
       canPop: !_isSubmitting,
@@ -268,6 +315,7 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
                       ),
                     const SizedBox(height: 14),
                     TextFormField(
+                      key: InvoiceFormDialog.amountFieldKey,
                       controller: _amountController,
                       enabled: !_isSubmitting,
                       keyboardType:
@@ -282,16 +330,43 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
                         errorMaxLines: 2,
                       ),
                       validator: InvoiceFormDialog.validateAmount,
-                      onChanged: (_) {
-                        if (_submitError != null) {
-                          setState(() => _submitError = null);
-                        }
-                      },
+                      // Se reconstruye para actualizar el saldo por cobrar.
+                      onChanged: (_) => setState(() => _submitError = null),
+                    ),
+                    const SizedBox(height: 14),
+                    TextFormField(
+                      key: InvoiceFormDialog.initialPaymentFieldKey,
+                      controller: _initialPaymentController,
+                      enabled: !_isSubmitting,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+                      ],
+                      decoration: InputDecoration(
+                        labelText: 'Abono inicial (S/.)',
+                        hintText: 'Ej: 0 o un monto menor al total',
+                        prefixIcon:
+                            const Icon(Icons.savings_outlined, size: 20),
+                        helperText:
+                            _initialPaymentHelper(total, initialPayment),
+                        errorMaxLines: 2,
+                      ),
+                      // Mientras refleja el total, el error lo muestra el total.
+                      validator: (raw) => _initialPaymentEdited
+                          ? InvoiceFormDialog.validateInitialPayment(raw, total)
+                          : null,
+                      onChanged: (_) => setState(() {
+                        _initialPaymentEdited = true;
+                        _submitError = null;
+                      }),
                     ),
                     const SizedBox(height: 18),
-                    const Text(
-                      'Método de pago *',
-                      style: TextStyle(
+                    Text(
+                      methodRequired
+                          ? 'Método de pago *'
+                          : 'Método de pago (no aplica sin abono inicial)',
+                      style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: AppColors.ink,
@@ -300,8 +375,9 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
                     const SizedBox(height: 8),
                     PaymentMethodPicker(
                       methodsState: methodsState,
-                      selectedMethodId: selectedMethodId,
-                      enabled: !_isSubmitting,
+                      selectedMethodId:
+                          methodRequired ? selectedMethodId : null,
+                      enabled: !_isSubmitting && methodRequired,
                       onSelected: (id) => setState(() {
                         _selectedMethodId = id;
                         _showMethodError = false;
@@ -310,7 +386,9 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
                       onRetry: () =>
                           ref.invalidate(payment_di.paymentMethodsProvider),
                     ),
-                    if (_showMethodError && selectedMethodId == null)
+                    if (_showMethodError &&
+                        methodRequired &&
+                        selectedMethodId == null)
                       const Padding(
                         padding: EdgeInsets.only(top: 6),
                         child: Text(
@@ -402,6 +480,13 @@ class _InvoiceFormDialogState extends ConsumerState<InvoiceFormDialog> {
         ),
       ],
     );
+  }
+
+  /// Saldo que quedará por cobrar si el abono inicial es menor al total.
+  String? _initialPaymentHelper(Money? total, Money? initialPayment) {
+    if (total == null || initialPayment == null) return null;
+    if (initialPayment >= total) return null;
+    return 'Saldo por cobrar: ${(total - initialPayment).format()}';
   }
 
   Widget _buildSubmitError(String message) {

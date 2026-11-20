@@ -290,7 +290,14 @@ void main() {
 
         await _selectAppointment(tester, 'Ana Torres');
 
-        expect(find.text('350.00'), findsOneWidget);
+        // El abono inicial refleja el total, así que se busca en el monto total.
+        expect(
+          find.descendant(
+            of: find.byKey(InvoiceFormDialog.amountFieldKey),
+            matching: find.text('350.00'),
+          ),
+          findsOneWidget,
+        );
         expect(tester.takeException(), isNull);
       });
 
@@ -385,7 +392,10 @@ void main() {
           (tester) async {
         final h = await _openDialog(tester, size);
 
-        await tester.enterText(find.byType(TextFormField), '120.555');
+        await tester.enterText(
+          find.byKey(InvoiceFormDialog.amountFieldKey),
+          '120.555',
+        );
         await _tapSubmit(tester);
         await tester.pumpAndSettle();
 
