@@ -27,7 +27,8 @@ final updatePatientUseCaseProvider = Provider<UpdatePatientUseCase>((ref) {
   return UpdatePatientUseCase(ref.read(patientRepositoryProvider));
 });
 
-final patientsViewModelProvider = StateNotifierProvider<PatientViewModel, List<Patient>>((ref) {
+final patientsViewModelProvider =
+    StateNotifierProvider<PatientViewModel, List<Patient>>((ref) {
   return PatientViewModel(
     ref.read(getAllPatientsUseCaseProvider),
     ref.read(addPatientUseCaseProvider),
@@ -58,18 +59,19 @@ final filteredPatientsProvider = Provider<List<Patient>>((ref) {
   }).toList();
 });
 
-final getAllMedicalHistoriesUseCaseProvider = Provider<GetAllMedicalHistoriesUseCase>((ref) {
-  return GetAllMedicalHistoriesUseCase(ref.read(medicalHistoryRepositoryProvider));
+final getAllMedicalHistoriesUseCaseProvider =
+    Provider<GetAllMedicalHistoriesUseCase>((ref) {
+  return GetAllMedicalHistoriesUseCase(
+      ref.read(medicalHistoryRepositoryProvider));
 });
 
-final addMedicalHistoryUseCaseProvider = Provider<AddMedicalHistoryUseCase>((ref) {
+final addMedicalHistoryUseCaseProvider =
+    Provider<AddMedicalHistoryUseCase>((ref) {
   return AddMedicalHistoryUseCase(ref.read(medicalHistoryRepositoryProvider));
 });
 
-final medicalHistoriesViewModelProvider = StateNotifierProvider.family<
-    MedicalHistoryViewModel,
-    List<MedicalHistory>,
-    int>((ref, id) {
+final medicalHistoriesViewModelProvider = StateNotifierProvider.autoDispose
+    .family<MedicalHistoryViewModel, List<MedicalHistory>, int>((ref, id) {
   return MedicalHistoryViewModel(
     ref.read(getAllMedicalHistoriesUseCaseProvider),
     ref.read(addMedicalHistoryUseCaseProvider),

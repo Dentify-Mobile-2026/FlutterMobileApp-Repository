@@ -1,5 +1,5 @@
-import 'package:dentify_flutter/patientAttention/patients/data/remote/dto/add_medical_history_request.dart';
 import 'package:dentify_flutter/core/theme/app_theme.dart';
+import 'package:dentify_flutter/patientAttention/patients/data/remote/dto/add_medical_history_request.dart';
 import 'package:dentify_flutter/patientAttention/patients/domain/model/patient.dart';
 import 'package:dentify_flutter/patientAttention/patients/presentation/di/presentation_module.dart';
 import 'package:dentify_flutter/patientAttention/patients/presentation/widgets/medical_history_card.dart';
@@ -7,71 +7,92 @@ import 'package:dentify_flutter/patientAttention/patients/presentation/widgets/m
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MedicalHistoriesView extends ConsumerWidget{
+class MedicalHistoriesView extends ConsumerWidget {
   const MedicalHistoriesView({super.key, required this.patient});
   final Patient patient;
 
+  Future<void> _add(BuildContext context, WidgetRef ref) async {
+    final result = await showDialog<Map<String, dynamic>>(
+        context: context, builder: (_) => MedicalHistoryForm(patient: patient));
+    if (result == null || !context.mounted) return;
+    final model =
+        ref.read(medicalHistoriesViewModelProvider(patient.id).notifier);
+    await model.addMedicalHistory(
+        result['request'] as AddMedicalHistoryRequest, patient.id);
+    if (context.mounted && model.errorMessage != null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(model.errorMessage!)));
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final medicalHistories = ref.watch(medicalHistoriesViewModelProvider(patient.id));
-    final isLoading = ref.watch(medicalHistoriesViewModelProvider(patient.id).notifier).isLoading;
-    
+    final provider = medicalHistoriesViewModelProvider(patient.id);
+    final histories = [...ref.watch(provider)]
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    final model = ref.watch(provider.notifier);
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text("${patient.firstName} ${patient.lastName}",
-      style: TextStyle(fontWeight: FontWeight.bold),)),
-      body: Column(
-        children: [
+      appBar: AppBar(title: const Text('Historial médico'), actions: [
+        IconButton(
+            tooltip: 'Actualizar historial',
+            onPressed: () => model.getAllMedicalHistories(patient.id),
+            icon: const Icon(Icons.refresh)),
+      ]),
+      body: Center(
+          child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 920),
+        child:
+            Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Padding(
+              padding: const EdgeInsets.all(16),
+              child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 16,
+                  runSpacing: 12,
+                  children: [
+                    Text(patient.fullName,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w600)),
+                    FilledButton.icon(
+                        onPressed: () => _add(context, ref),
+                        icon: const Icon(Icons.add),
+                        label: const Text('Nueva evolución')),
+                  ])),
           Expanded(
-              child: isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : medicalHistories.isEmpty
-                  ? const Center(child: Text('No medical histories found.'))
-              : ListView.builder(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 100),
-                itemCount: medicalHistories.length,
-                itemBuilder:(context, index) {
-                  final medicalHistory = medicalHistories[index];
-                  return MedicalHistoryCard(medicalHistory: medicalHistory);
-                },)
-            )
-            ],
-      ),  
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () async {
-              final result = await showDialog<Map<String, dynamic>>(
-                context: context,
-                builder: (context) => MedicalHistoryForm(patient: patient),
-              );
-              if (result != null) {
-                final request = result['request'] as AddMedicalHistoryRequest;
-                final id = result['id'] as int;
-
-                await ref
-                    .read(medicalHistoriesViewModelProvider(id).notifier)
-                    .addMedicalHistory(request, id);
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            child: const Text('Add medical history'),
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+              child: model.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : model.errorMessage != null
+                      ? Center(
+                          child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(model.errorMessage!),
+                                    TextButton(
+                                        onPressed: () => model
+                                            .getAllMedicalHistories(patient.id),
+                                        child: const Text('Reintentar')),
+                                  ])))
+                      : histories.isEmpty
+                          ? const Center(
+                              child: Text(
+                                  'Aún no hay evoluciones médicas registradas.'))
+                          : RefreshIndicator(
+                              onRefresh: () =>
+                                  model.getAllMedicalHistories(patient.id),
+                              child: ListView.builder(
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(8, 0, 8, 24),
+                                  itemCount: histories.length,
+                                  itemBuilder: (_, index) => MedicalHistoryCard(
+                                      medicalHistory: histories[index])))),
+        ]),
+      )),
     );
   }
 }
