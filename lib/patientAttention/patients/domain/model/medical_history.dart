@@ -5,13 +5,17 @@ class MedicalHistory {
   final String diagnosis;
   final String medication;
   final String createdAt;
+  final String? appointmentDate;
+  final int? sourceAppointmentId;
 
   const MedicalHistory({
-      required this.id,
-      required this.description,
-      required this.record,
-      required this.diagnosis,
-      required this.medication,
-      required this.createdAt
+    required this.id,
+    required this.description,
+    required this.record,
+    required this.diagnosis,
+    required this.medication,
+    required this.createdAt,
+    this.appointmentDate,
+    this.sourceAppointmentId,
   });
 }

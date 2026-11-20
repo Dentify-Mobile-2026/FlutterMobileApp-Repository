@@ -4,15 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-class MedicalHistoryCard extends ConsumerWidget{
+class MedicalHistoryCard extends ConsumerWidget {
   const MedicalHistoryCard({super.key, required this.medicalHistory});
   final MedicalHistory medicalHistory;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final date = DateTime.parse(medicalHistory.createdAt);
-    final formatted = DateFormat("MMMM d, y", 'en_US').format(date);
-    final formattedHour = DateFormat.Hm().format(date); 
+    final date = DateTime.parse(
+        medicalHistory.appointmentDate ?? medicalHistory.createdAt);
+    final formatted = DateFormat('dd/MM/yyyy').format(date);
+    final formattedHour = DateFormat.Hm().format(date);
 
     return Card(
       color: Colors.white,
@@ -42,7 +43,8 @@ class MedicalHistoryCard extends ConsumerWidget{
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Column(
+                    Expanded(
+                        child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
@@ -53,14 +55,14 @@ class MedicalHistoryCard extends ConsumerWidget{
                           ),
                         ),
                         Text(
-                          'Created At: $formattedHour',
+                          '${medicalHistory.sourceAppointmentId == null ? 'Registrado' : 'Cita atendida'}: $formattedHour',
                           style: const TextStyle(
                             fontSize: 14,
                             color: Colors.grey,
                           ),
                         ),
                       ],
-                    ),
+                    )),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -70,19 +72,19 @@ class MedicalHistoryCard extends ConsumerWidget{
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       InfoRow(
-                        label: 'Diagnosis:',
+                        label: 'Diagnóstico:',
                         value: medicalHistory.diagnosis,
                       ),
                       InfoRow(
-                        label: 'Description:',
+                        label: 'Descripción:',
                         value: medicalHistory.description,
                       ),
                       InfoRow(
-                        label: 'Record:',
+                        label: 'Evolución:',
                         value: medicalHistory.record,
                       ),
                       InfoRow(
-                        label: 'Medication:',
+                        label: 'Medicación:',
                         value: medicalHistory.medication,
                       ),
                     ],
@@ -97,8 +99,6 @@ class MedicalHistoryCard extends ConsumerWidget{
     );
   }
 }
-
-
 
 class InfoRow extends StatelessWidget {
   final String label;

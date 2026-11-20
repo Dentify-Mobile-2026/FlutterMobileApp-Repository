@@ -1,4 +1,5 @@
 import 'package:dentify_flutter/core/theme/app_theme.dart';
+import 'package:dentify_flutter/patientAttention/treatment_plans/presentation/views/treatment_plans_view.dart';
 import 'package:dentify_flutter/core/utils/whatsapp_helper.dart';
 import 'package:dentify_flutter/iam/presentation/di/presentation_module.dart'
     as iam_di;
@@ -101,7 +102,8 @@ class PatientCard extends ConsumerWidget {
                         spacing: 10,
                         runSpacing: 2,
                         children: [
-                          _metaChip(Icons.badge_outlined, 'DNI: ${patient.dni}'),
+                          _metaChip(
+                              Icons.badge_outlined, 'DNI: ${patient.dni}'),
                           if (patient.phone.isNotEmpty)
                             _metaChip(Icons.phone_outlined, patient.phone),
                         ],
@@ -132,7 +134,6 @@ class PatientCard extends ConsumerWidget {
                 ),
               ],
             ),
-
             if (patient.hasMedicalAlerts) ...[
               const SizedBox(height: 10),
               Container(
@@ -215,18 +216,18 @@ class PatientCard extends ConsumerWidget {
                 ],
               ),
             ],
-
             const SizedBox(height: 12),
             const Divider(height: 1),
             const SizedBox(height: 12),
-
             Wrap(
               spacing: 18,
               runSpacing: 8,
               children: [
                 _infoDetail(Icons.email_outlined, 'Email', patient.email),
-                _infoDetail(Icons.cake_outlined, 'Nacimiento', patient.birthday),
-                _infoDetail(Icons.location_on_outlined, 'Dirección', patient.homeAddress),
+                _infoDetail(
+                    Icons.cake_outlined, 'Nacimiento', patient.birthday),
+                _infoDetail(Icons.location_on_outlined, 'Dirección',
+                    patient.homeAddress),
                 if (patient.emergencyContactName.isNotEmpty ||
                     patient.emergencyContactPhone.isNotEmpty)
                   _infoDetail(
@@ -241,7 +242,6 @@ class PatientCard extends ConsumerWidget {
                   ),
               ],
             ),
-
             const SizedBox(height: 14),
             Align(
               alignment: Alignment.centerRight,
@@ -265,6 +265,15 @@ class PatientCard extends ConsumerWidget {
                       'WhatsApp',
                       style: TextStyle(fontWeight: FontWeight.w700),
                     ),
+                  ),
+                  FilledButton.tonalIcon(
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) =>
+                                TreatmentPlansView(patient: patient))),
+                    icon: const Icon(Icons.receipt_long_outlined, size: 18),
+                    label: const Text('Planes de tratamiento'),
                   ),
                   FilledButton.tonalIcon(
                     style: FilledButton.styleFrom(
@@ -431,14 +440,17 @@ class PatientCard extends ConsumerWidget {
       final id = result['id'] as int;
       final update = result['update'] as UpdatePatientRequest;
 
-      await ref.read(patientsViewModelProvider.notifier).updatePatient(id, update);
+      await ref
+          .read(patientsViewModelProvider.notifier)
+          .updatePatient(id, update);
 
       if (context.mounted) {
         final error = ref.read(patientsViewModelProvider.notifier).errorMessage;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(error ?? 'Ficha de paciente actualizada'),
-            backgroundColor: error != null ? AppColors.danger : AppColors.success,
+            backgroundColor:
+                error != null ? AppColors.danger : AppColors.success,
           ),
         );
       }
