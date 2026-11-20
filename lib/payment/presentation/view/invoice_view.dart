@@ -197,13 +197,15 @@ class _InvoiceViewState extends ConsumerState<InvoiceView> {
     final paidCount = invoices
         .where((invoice) => invoice.status == InvoiceStatus.paid)
         .length;
+    // Wrap en lugar de lista horizontal: en pantallas angostas los tres filtros
+    // siguen visibles (pasan a otra línea) sin desplazamiento oculto.
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       child: SizedBox(
-        height: 36,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+        width: double.infinity,
+        child: Wrap(
+          spacing: 6,
+          runSpacing: 6,
           children: [
             _filterChip(_InvoiceFilter.all, 'Todos (${invoices.length})'),
             _filterChip(
@@ -218,15 +220,12 @@ class _InvoiceViewState extends ConsumerState<InvoiceView> {
   }
 
   Widget _filterChip(_InvoiceFilter filter, String label) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 6),
-      child: ChoiceChip(
-        visualDensity: VisualDensity.compact,
-        label: Text(label, style: const TextStyle(fontSize: 12)),
-        selected: _filter == filter,
-        selectedColor: AppColors.mint,
-        onSelected: (_) => setState(() => _filter = filter),
-      ),
+    return ChoiceChip(
+      visualDensity: VisualDensity.compact,
+      label: Text(label, style: const TextStyle(fontSize: 12)),
+      selected: _filter == filter,
+      selectedColor: AppColors.mint,
+      onSelected: (_) => setState(() => _filter = filter),
     );
   }
 
