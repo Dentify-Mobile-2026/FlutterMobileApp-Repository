@@ -4,8 +4,9 @@ import 'navigation/dentify_app.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 final RouteObserver<PageRoute<dynamic>> routeObserver = RouteObserver<PageRoute<dynamic>>();
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('es_PE', null);
   await initializeDateFormatting('en_US', null);
   runApp(
     ProviderScope(child: DentifyApp()),

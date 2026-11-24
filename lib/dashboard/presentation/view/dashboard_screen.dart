@@ -37,9 +37,29 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Error al cargar el dashboard.', style: TextStyle(fontSize: 16)),
+                const Icon(Icons.cloud_off_outlined,
+                    size: 40, color: AppColors.muted),
                 const SizedBox(height: 12),
-                Text(e.toString(), style: const TextStyle(color: Colors.red)),
+                const Text('Error al cargar el dashboard.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.ink,
+                    )),
+                const SizedBox(height: 8),
+                Text(
+                  e.toString().replaceFirst('Exception: ', ''),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: AppColors.danger, fontSize: 13),
+                ),
+                const SizedBox(height: 14),
+                OutlinedButton.icon(
+                  onPressed: () => ref
+                      .read(dashboardViewModelProvider.notifier)
+                      .loadDashboardData(),
+                  icon: const Icon(Icons.refresh, size: 18),
+                  label: const Text('Reintentar'),
+                ),
               ],
             ),
           ),

@@ -1,3 +1,4 @@
+import 'package:dentify_flutter/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class ProfileField extends StatelessWidget {
@@ -13,8 +14,22 @@ class ProfileField extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.grey)),
-          Text(value, style: const TextStyle(fontSize: 16)),
+          Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+              color: AppColors.muted,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 15,
+              color: AppColors.ink,
+            ),
+          ),
         ],
       ),
     );
