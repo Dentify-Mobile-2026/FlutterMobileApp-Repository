@@ -90,7 +90,7 @@ flutter analyze     # Analiza calidad y estilo de código
 
 ### 1. Generar APK Android (Windows) y subir a Firebase App Distribution
 
-**Firebase App ID configurado (`google-services.json`):** `1:430716301992:android:815cb81d8c63fca63f489d` (`upc.edu.pe.dentify_flutter`)
+**Firebase App ID configurado (`google-services.json`):** `1:474750754642:android:b32b78d61c18bdd47da48b` (`com.dentify.agile`)
 
 #### A) Firma Release (opcional pero recomendada)
 1. Genera tu keystore fuera del repositorio:
@@ -117,7 +117,7 @@ cd Front-Flutter
 # Opción 2: Generar APK y subirlo directo a Firebase App Distribution (requiere `firebase login` previo)
 .\build-apk.ps1 `
   -ApiBaseUrl "https://dentify-api-upc.azurewebsites.net/api/" `
-  -FirebaseAppId "1:430716301992:android:815cb81d8c63fca63f489d" `
+  -FirebaseAppId "1:474750754642:android:b32b78d61c18bdd47da48b" `
   -TestersGroup "equipo-dentify"
 ```
 El archivo generado queda en: `build/app/outputs/flutter-apk/app-release.apk`.
