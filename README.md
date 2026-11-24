@@ -21,14 +21,20 @@ Aplicación multiplataforma (Web y Móvil) de **Dentify** orientada a odontólog
 
 ## ⚙️ Configuración de Conexión al Backend
 
-La URL del servicio está centralizada en `lib/core/network/api_constants.dart`. Por defecto apunta a:
+La URL del servicio está centralizada en `lib/core/network/api_constants.dart`. Por defecto apunta en local a:
 ```
 http://localhost:8080/api/
 ```
 
-Si deseas apuntar a otra URL en tiempo de ejecución o compilación, puedes sobreescribirla con `--dart-define`:
+**Backend en producción (Azure + Aiven MySQL):**
+```
+https://dentify-api-upc.azurewebsites.net/api/
+```
+*(Health check: `https://dentify-api-upc.azurewebsites.net/health`)*
+
+Si deseas apuntar a otra URL en tiempo de ejecución o compilación, pásala siempre con `--dart-define`:
 ```bash
---dart-define=API_BASE_URL=http://tu-servidor:8080/api/
+--dart-define=API_BASE_URL=https://dentify-api-upc.azurewebsites.net/api/
 ```
 
 ---
@@ -77,3 +83,92 @@ flutter run -d <id_del_dispositivo> --dart-define=API_BASE_URL=http://10.0.2.2:8
 flutter test        # Ejecuta pruebas unitarias de Flutter
 flutter analyze     # Analiza calidad y estilo de código
 ```
+
+---
+
+## 📦 Compilación Móvil y Distribución (Android APK & iOS IPA)
+
+### 1. Generar APK Android (Windows) y subir a Firebase App Distribution
+
+**Firebase App ID configurado (`google-services.json`):** `1:430716301992:android:815cb81d8c63fca63f489d` (`upc.edu.pe.dentify_flutter`)
+
+#### A) Firma Release (opcional pero recomendada)
+1. Genera tu keystore fuera del repositorio:
+   ```powershell
+   & "C:\Program Files\Java\jdk-17.0.12\bin\keytool.exe" -genkey -v -keystore C:\Users\user\dentify-release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias dentify
+   ```
+2. Crea `android/key.properties` (ignorado en `.gitignore`):
+   ```properties
+   storePassword=TU_PASSWORD
+   keyPassword=TU_PASSWORD
+   keyAlias=dentify
+   storeFile=C:\\Users\\user\\dentify-release.jks
+   ```
+   *(Si omites este paso, Gradle compilará usando firma debug válida para Firebase App Distribution).*
+
+#### B) Compilar APK apuntando a Azure y distribuir
+Con el script incluido `build-apk.ps1`:
+```powershell
+cd Front-Flutter
+
+# Opción 1: Solo generar el APK release conectado a Azure
+.\build-apk.ps1 -ApiBaseUrl "https://dentify-api-upc.azurewebsites.net/api/"
+
+# Opción 2: Generar APK y subirlo directo a Firebase App Distribution (requiere `firebase login` previo)
+.\build-apk.ps1 `
+  -ApiBaseUrl "https://dentify-api-upc.azurewebsites.net/api/" `
+  -FirebaseAppId "1:430716301992:android:815cb81d8c63fca63f489d" `
+  -TestersGroup "equipo-dentify"
+```
+El archivo generado queda en: `build/app/outputs/flutter-apk/app-release.apk`.
+
+*(Sin script, el comando manual equivalente es:)*
+```powershell
+flutter clean
+flutter pub get
+flutter build apk --release --dart-define=API_BASE_URL=https://dentify-api-upc.azurewebsites.net/api/
+```
+
+---
+
+### 2. Compilar e Instalar en iOS / Generar `.ipa` (desde macOS)
+
+> La compilación de iOS requiere **macOS + Xcode + CocoaPods**.
+
+#### A) Preparar proyecto en tu Mac
+```bash
+git clone https://github.com/Dentify-Mobile-2026/FlutterMobileApp-Repository.git
+cd FlutterMobileApp-Repository
+git checkout main
+flutter pub get
+cd ios
+pod install
+cd ..
+```
+
+#### B) Configurar firma en Xcode
+1. Abre el workspace (siempre `.xcworkspace`, no `.xcodeproj`):
+   ```bash
+   open ios/Runner.xcworkspace
+   ```
+2. En el panel izquierdo selecciona **Runner -> Targets: Runner -> Signing & Capabilities**:
+   - Activa **Automatically manage signing**.
+   - En **Team**, selecciona tu cuenta Apple (Apple ID gratuito o cuenta Apple Developer).
+   - Si aparece error de *Bundle Identifier* duplicado (`upc.edu.pe.dentify_flutter`), cámbialo temporalmente a uno único tuyo (ej. `com.tunombre.dentify`).
+
+#### C) Instalar directo en tu iPhone (sin pagar Apple Developer)
+Conecta el iPhone por USB al Mac, confía en la computadora y ejecuta:
+```bash
+flutter run --release --dart-define=API_BASE_URL=https://dentify-api-upc.azurewebsites.net/api/
+```
+*(En el iPhone: **Ajustes -> General -> Gestión de dispositivos y VPN -> Confiar** en tu Apple ID).*
+
+#### D) Exportar archivo `.ipa` (requiere cuenta Apple Developer paga para Ad Hoc / TestFlight / Firebase)
+1. Registra los **UDID** de los iPhone de prueba en Apple Developer Portal (**Certificates, Identifiers & Profiles -> Devices**) si usarás **Ad Hoc / Firebase App Distribution**.
+2. Genera el `.ipa` conectado a Azure:
+   ```bash
+   flutter build ipa --export-method ad-hoc --dart-define=API_BASE_URL=https://dentify-api-upc.azurewebsites.net/api/
+   ```
+   *(Para App Store / TestFlight usa `--export-method app-store`)*.
+3. El paquete se generará en `build/ios/ipa/*.ipa` listo para subir a **Firebase App Distribution** (agregando la app iOS en Firebase Console) o **Transporter / TestFlight**.
+4. *(Alternativa visual si falla el CLI)*: ejecuta `flutter build ios --release --dart-define=API_BASE_URL=https://dentify-api-upc.azurewebsites.net/api/`, abre `ios/Runner.xcworkspace` en Xcode, elige **Any iOS Device (arm64)** y ve a **Product -> Archive -> Distribute App**.
