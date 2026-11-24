@@ -32,30 +32,30 @@ class _RegisterPageState extends State<RegisterPage> {
     final vm = widget.viewModel;
     final error = vm.errorMessage;
     return AuthScaffold(
-      title: 'Create your account',
-      subtitle: 'Start organizing appointments, patients and payments',
+      title: 'Crea tu cuenta',
+      subtitle: 'Empieza a organizar citas, pacientes y pagos',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              Expanded(child: TextField(onChanged: (v) => vm.firstName = v, decoration: const InputDecoration(labelText: 'First name'))),
+              Expanded(child: TextField(onChanged: (v) => vm.firstName = v, decoration: const InputDecoration(labelText: 'Nombres'))),
               const SizedBox(width: 12),
-              Expanded(child: TextField(onChanged: (v) => vm.lastName = v, decoration: const InputDecoration(labelText: 'Last name'))),
+              Expanded(child: TextField(onChanged: (v) => vm.lastName = v, decoration: const InputDecoration(labelText: 'Apellidos'))),
             ],
           ),
           const SizedBox(height: 14),
-          TextField(onChanged: (v) => vm.email = v, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.mail_outline))),
+          TextField(onChanged: (v) => vm.email = v, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Correo electrónico', prefixIcon: Icon(Icons.mail_outline))),
           const SizedBox(height: 14),
-          TextField(onChanged: (v) => vm.companyName = v, decoration: const InputDecoration(labelText: 'Practice name', prefixIcon: Icon(Icons.business_outlined))),
+          TextField(onChanged: (v) => vm.companyName = v, decoration: const InputDecoration(labelText: 'Nombre del consultorio', prefixIcon: Icon(Icons.business_outlined))),
           const SizedBox(height: 14),
-          TextField(onChanged: (v) => vm.username = v, decoration: const InputDecoration(labelText: 'Username', prefixIcon: Icon(Icons.person_outline))),
+          TextField(onChanged: (v) => vm.username = v, decoration: const InputDecoration(labelText: 'Usuario', prefixIcon: Icon(Icons.person_outline))),
           const SizedBox(height: 14),
           TextField(
             obscureText: _hidePassword,
             onChanged: (v) => vm.password = v,
             decoration: InputDecoration(
-              labelText: 'Password',
+              labelText: 'Contraseña',
               prefixIcon: const Icon(Icons.lock_outline),
               suffixIcon: IconButton(
                 icon: Icon(_hidePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined),
@@ -67,7 +67,7 @@ class _RegisterPageState extends State<RegisterPage> {
             contentPadding: EdgeInsets.zero,
             value: vm.trial,
             onChanged: (v) => setState(() => vm.trial = v),
-            title: const Text('Start with a free trial'),
+            title: const Text('Comenzar con prueba gratuita'),
           ),
           if (error != null) AuthError(error),
           SizedBox(
@@ -76,11 +76,11 @@ class _RegisterPageState extends State<RegisterPage> {
               onPressed: _isLoading ? null : _submit,
               child: _isLoading
                   ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.white))
-                  : const Text('Create account'),
+                  : const Text('Crear cuenta'),
             ),
           ),
           const SizedBox(height: 8),
-          TextButton(onPressed: widget.toLogin, child: const Text('Already have an account? Sign in')),
+          TextButton(onPressed: widget.toLogin, child: const Text('¿Ya tienes cuenta? Inicia sesión')),
         ],
       ),
     );

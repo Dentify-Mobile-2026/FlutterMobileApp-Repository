@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-    branches: [main, payments]
+    branches: [main, dev, payments]
   pull_request:
 jobs:
   flutter:

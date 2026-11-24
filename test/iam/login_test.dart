@@ -31,7 +31,7 @@ void main() {
     final textFields = find.byType(TextField);
     await tester.enterText(textFields.at(0), 'dentist');
     await tester.enterText(textFields.at(1), 'secret');
-    await tester.tap(find.text('Login'));
+    await tester.tap(find.text('Iniciar sesión'));
     await tester.pumpAndSettle();
 
     expect(repository.username, 'dentist');

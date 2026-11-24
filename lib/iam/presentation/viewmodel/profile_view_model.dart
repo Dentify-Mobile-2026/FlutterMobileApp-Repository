@@ -19,31 +19,47 @@ class ProfileViewModel extends StateNotifier<ProfileState> {
   }) : super(ProfileState());
 
   Future<void> fetchUserInfo() async {
-  try {
-    state = state.copyWith(isLoading: true, errorMessage: null);
-    final result = await getUserInfoUseCase();
-    state = state.copyWith(userInfo: result, errorMessage: null, isLoading: false);
-  } catch (e) {
-    state = state.copyWith(errorMessage: 'Error fetching user info: ${e.toString()}', isLoading: false);
+    try {
+      state = state.copyWith(isLoading: true, errorMessage: null);
+      final result = await getUserInfoUseCase();
+      state = state.copyWith(userInfo: result, errorMessage: null, isLoading: false);
+    } catch (e) {
+      state = state.copyWith(
+        errorMessage: _cleanMessage(e, 'No se pudo cargar el perfil'),
+        isLoading: false,
+      );
+    }
   }
-}
 
   Future<void> updatePassword(UpdatePasswordRequest request) async {
     try {
+      state = state.copyWith(isLoading: true, errorMessage: null);
       await updatePasswordUseCase(request);
-      state = state.copyWith(errorMessage: null);
+      state = state.copyWith(isLoading: false, errorMessage: null);
     } catch (e) {
-      state = state.copyWith(errorMessage: 'Password update failed: ${e.toString()}');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: _cleanMessage(e, 'No se pudo actualizar la contraseña'),
+      );
     }
   }
 
   Future<void> updateInformation(UpdateInformationRequest request) async {
     try {
+      state = state.copyWith(isLoading: true, errorMessage: null);
       await updateInformationUseCase(request);
       await fetchUserInfo();
     } catch (e) {
-      state = state.copyWith(errorMessage: 'Information update failed: ${e.toString()}');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: _cleanMessage(e, 'No se pudo actualizar la información'),
+      );
     }
+  }
+
+  String _cleanMessage(Object error, String fallback) {
+    final raw = error.toString().replaceFirst('Exception: ', '').trim();
+    return raw.isEmpty ? fallback : raw;
   }
 
   void setError(String message) {

@@ -120,22 +120,56 @@ class _TreatmentPlansViewState extends ConsumerState<TreatmentPlansView> {
     );
   }
 
-  Widget _card(TreatmentPlan plan) => Card(
-        margin: const EdgeInsets.only(bottom: 14),
-        child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(plan.title,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 8),
-                  Wrap(spacing: 12, runSpacing: 8, children: [
-                    Text(plan.statusLabel),
+  (Color, Color) _statusColors(String status) {
+    return switch (status) {
+      'APPROVED' => (AppColors.infoLight, AppColors.info),
+      'IN_PROGRESS' => (AppColors.warningLight, AppColors.warning),
+      'COMPLETED' => (AppColors.successLight, AppColors.success),
+      'CANCELLED' => (AppColors.dangerLight, AppColors.danger),
+      _ => (AppColors.surfaceSubtle, AppColors.muted),
+    };
+  }
+
+  Widget _card(TreatmentPlan plan) {
+    final (badgeBg, badgeFg) = _statusColors(plan.status);
+    return Card(
+      margin: const EdgeInsets.only(bottom: 14),
+      child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(plan.title,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: badgeBg,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        plan.statusLabel,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: badgeFg,
+                        ),
+                      ),
+                    ),
                     Text(plan.totalAmount.formatted,
-                        style: const TextStyle(fontWeight: FontWeight.w700))
-                  ]),
+                        style: const TextStyle(fontWeight: FontWeight.w700)),
+                  ],
+                ),
                   if (plan.notes.isNotEmpty)
                     Padding(
                         padding: const EdgeInsets.only(top: 8),
@@ -204,5 +238,6 @@ class _TreatmentPlansViewState extends ConsumerState<TreatmentPlansView> {
                               child: const Text('Cancelar plan')),
                       ]),
                 ])),
-      );
+    );
+  }
 }

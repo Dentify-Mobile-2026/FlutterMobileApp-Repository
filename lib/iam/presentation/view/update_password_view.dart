@@ -1,103 +1,260 @@
-import 'package:dentify_flutter/iam/presentation/di/presentation_module.dart';
 import 'package:dentify_flutter/core/theme/app_theme.dart';
+import 'package:dentify_flutter/iam/data/remote/dto/update_password_request.dart';
+import 'package:dentify_flutter/iam/presentation/di/presentation_module.dart';
 import 'package:dentify_flutter/iam/presentation/viewmodel/profile_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/remote/dto/update_password_request.dart';
-
-class UpdatePasswordView extends ConsumerWidget {
+class UpdatePasswordView extends ConsumerStatefulWidget {
   final ProfileViewModel viewModel;
 
   const UpdatePasswordView({super.key, required this.viewModel});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final viewModel = ref.read(profileViewModelProvider.notifier);
-    final state = ref.watch(profileViewModelProvider);
+  ConsumerState<UpdatePasswordView> createState() => _UpdatePasswordViewState();
+}
 
-    final currentPass = TextEditingController();
-    final newPass = TextEditingController();
-    final confirmPass = TextEditingController();
+class _UpdatePasswordViewState extends ConsumerState<UpdatePasswordView> {
+  final _formKey = GlobalKey<FormState>();
+  final _currentPass = TextEditingController();
+  final _newPass = TextEditingController();
+  final _confirmPass = TextEditingController();
+
+  bool _hideCurrent = true;
+  bool _hideNew = true;
+  bool _hideConfirm = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(profileViewModelProvider.notifier).clearError();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _currentPass.dispose();
+    _newPass.dispose();
+    _confirmPass.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    final notifier = ref.read(profileViewModelProvider.notifier);
+    await notifier.updatePassword(
+      UpdatePasswordRequest(
+        oldPassword: _currentPass.text,
+        newPassword: _newPass.text,
+      ),
+    );
+    if (ref.read(profileViewModelProvider).errorMessage == null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Contraseña actualizada correctamente')),
+      );
+      Navigator.pop(context);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(profileViewModelProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Change Password', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: AppColors.primary,
+        title: const Text('Cambiar contraseña'),
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(height: 1),
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: ListView(
-          children: [
-            const Text(
-              'Update Your Password',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
-              ),
-            ),
-            const SizedBox(height: 24),
-            _buildPasswordInput("Current Password", currentPass),
-            const SizedBox(height: 16),
-            _buildPasswordInput("New Password", newPass),
-            const SizedBox(height: 16),
-            _buildPasswordInput("Confirm Password", confirmPass),
-            const SizedBox(height: 24),
-            if (state.errorMessage != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Text(
-                  state.errorMessage!,
-                  style: const TextStyle(color: Colors.red),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppColors.mint,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.lock_reset_outlined,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Seguridad de la cuenta',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.ink,
+                                  ),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'Ingresa tu contraseña actual y define una nueva de al menos 6 caracteres',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.muted,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      _buildPasswordField(
+                        controller: _currentPass,
+                        label: 'Contraseña actual *',
+                        obscure: _hideCurrent,
+                        onToggle: () =>
+                            setState(() => _hideCurrent = !_hideCurrent),
+                        validator: (v) => (v == null || v.isEmpty)
+                            ? 'Ingresa tu contraseña actual'
+                            : null,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildPasswordField(
+                        controller: _newPass,
+                        label: 'Nueva contraseña *',
+                        obscure: _hideNew,
+                        onToggle: () => setState(() => _hideNew = !_hideNew),
+                        validator: (v) {
+                          if (v == null || v.isEmpty) {
+                            return 'Ingresa una nueva contraseña';
+                          }
+                          if (v.length < 6) {
+                            return 'Debe tener al menos 6 caracteres';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      _buildPasswordField(
+                        controller: _confirmPass,
+                        label: 'Confirmar nueva contraseña *',
+                        obscure: _hideConfirm,
+                        onToggle: () =>
+                            setState(() => _hideConfirm = !_hideConfirm),
+                        validator: (v) {
+                          if (v == null || v.isEmpty) {
+                            return 'Confirma tu nueva contraseña';
+                          }
+                          if (v != _newPass.text) {
+                            return 'Las contraseñas no coinciden';
+                          }
+                          return null;
+                        },
+                      ),
+                      if (state.errorMessage != null) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.dangerLight,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: AppColors.dangerBorder),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.error_outline,
+                                size: 18,
+                                color: AppColors.danger,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  state.errorMessage!,
+                                  style: const TextStyle(
+                                    color: AppColors.danger,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          OutlinedButton(
+                            onPressed: state.isLoading
+                                ? null
+                                : () => Navigator.pop(context),
+                            child: const Text('Cancelar'),
+                          ),
+                          const SizedBox(width: 12),
+                          FilledButton.icon(
+                            onPressed: state.isLoading ? null : _submit,
+                            icon: state.isLoading
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(Icons.check_outlined, size: 18),
+                            label: const Text('Actualizar contraseña'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ElevatedButton.icon(
-              onPressed: () async {
-                if (newPass.text != confirmPass.text) {
-                  viewModel.setError("Passwords do not match.");
-                  return;
-                }
-
-                await viewModel.updatePassword(
-                  UpdatePasswordRequest(oldPassword: currentPass.text, newPassword: newPass.text),
-                );
-
-                if (ref.read(profileViewModelProvider).errorMessage == null && context.mounted) {
-                  Navigator.pop(context);
-                }
-              },
-              icon: const Icon(Icons.lock_reset),
-              label: const Text("Update Password"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(48),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              ),
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildPasswordInput(String label, TextEditingController controller) {
-    return TextField(
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required String label,
+    required bool obscure,
+    required VoidCallback onToggle,
+    required String? Function(String?) validator,
+  }) {
+    return TextFormField(
       controller: controller,
-      obscureText: true,
+      obscureText: obscure,
+      validator: validator,
       decoration: InputDecoration(
         labelText: label,
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.primary),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        prefixIcon: const Icon(Icons.lock_outline),
+        suffixIcon: IconButton(
+          icon: Icon(
+            obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+          ),
+          onPressed: onToggle,
         ),
       ),
     );

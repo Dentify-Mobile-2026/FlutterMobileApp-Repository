@@ -31,7 +31,6 @@ class ItemViewModel extends StateNotifier<List<Item>> {
     } catch (e) {
       errorMessage = e.toString();
       state = [];
-      print('Error fetching items: $errorMessage');
     } finally {
       isLoading = false;
     }
@@ -43,7 +42,6 @@ class ItemViewModel extends StateNotifier<List<Item>> {
       state = state.where((item) => item.id != id).toList();
     } catch (e) {
       errorMessage = e.toString();
-      print('Error deleting item: $errorMessage');
     }
   }
 
@@ -53,7 +51,6 @@ class ItemViewModel extends StateNotifier<List<Item>> {
       await getAllItems();
     } catch (e) {
       errorMessage = e.toString();
-      print('Error adding item: $errorMessage');
     }
   }
 

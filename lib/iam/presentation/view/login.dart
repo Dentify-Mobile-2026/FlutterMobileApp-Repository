@@ -36,15 +36,18 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final error = widget.viewModel.errorMessage;
     return AuthScaffold(
-      title: 'Welcome back',
-      subtitle: 'Manage your dental practice in one place',
+      title: 'Bienvenido de nuevo',
+      subtitle: 'Gestiona tu consultorio dental en un solo lugar',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           TextField(
             onChanged: (value) => widget.viewModel.username = value,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(labelText: 'Username', prefixIcon: Icon(Icons.person_outline)),
+            decoration: const InputDecoration(
+              labelText: 'Usuario',
+              prefixIcon: Icon(Icons.person_outline),
+            ),
           ),
           const SizedBox(height: 16),
           TextField(
@@ -52,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
             onChanged: (value) => widget.viewModel.password = value,
             onSubmitted: (_) => _isLoading ? null : _submit(),
             decoration: InputDecoration(
-              labelText: 'Password',
+              labelText: 'Contraseña',
               prefixIcon: const Icon(Icons.lock_outline),
               suffixIcon: IconButton(
                 icon: Icon(_hidePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined),
@@ -68,11 +71,14 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: _isLoading ? null : _submit,
               child: _isLoading
                   ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.white))
-                  : const Text('Login'),
+                  : const Text('Iniciar sesión'),
             ),
           ),
           const SizedBox(height: 8),
-          TextButton(onPressed: widget.toRegister, child: const Text("Don't have an account? Create one")),
+          TextButton(
+            onPressed: widget.toRegister,
+            child: const Text('¿No tienes cuenta? Regístrate'),
+          ),
         ],
       ),
     );

@@ -11,28 +11,27 @@ class DashboardApiService {
   DashboardApiService(this.baseUrl);
 
   Future<DashboardResponseDto> getDashboardData() async {
-    final token =
-        await TokenStorage.getAccessToken(); // <- Aquí se recupera el token
-    print('Sending token: $token');
+    final token = await TokenStorage.getAccessToken();
 
     if (token == null || token.isEmpty) {
-      throw Exception("No access token found. Please login again.");
+      throw Exception('Sesión no encontrada. Inicia sesión nuevamente.');
     }
 
-    final response = await http.get(
-      ApiConstants.endpoint(baseUrl, 'v1/dashboard'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-    );
+    final response = await http
+        .get(
+          ApiConstants.endpoint(baseUrl, 'v1/dashboard'),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        )
+        .timeout(const Duration(seconds: 20));
 
     if (response.statusCode == 200) {
-      final json = jsonDecode(response.body);
-      return DashboardResponseDto.fromJson(json);
+      final data = jsonDecode(utf8.decode(response.bodyBytes));
+      return DashboardResponseDto.fromJson(data);
     } else {
-      print('Dashboard error ${response.statusCode}: ${response.body}');
-      throw Exception('Error ${response.statusCode}: ${response.body}');
+      throw Exception('Error al cargar el panel (${response.statusCode})');
     }
   }
 }

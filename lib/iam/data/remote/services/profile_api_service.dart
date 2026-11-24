@@ -14,51 +14,65 @@ class ProfileApiService {
 
   Future<UserInfoResponse> getUserInfo() async {
     final token = await TokenStorage.getAccessToken();
-    print('Token: $token');
-    final response = await http.get(
-      ApiConstants.endpoint(baseUrl, 'v1/profile'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
-
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
+    final response = await http
+        .get(
+          ApiConstants.endpoint(baseUrl, 'v1/profile'),
+          headers: {'Authorization': 'Bearer $token'},
+        )
+        .timeout(const Duration(seconds: 15));
 
     if (response.statusCode == 200) {
-      return UserInfoResponse.fromJson(json.decode(response.body));
+      return UserInfoResponse.fromJson(
+        json.decode(utf8.decode(response.bodyBytes)),
+      );
     } else {
-      throw Exception('Error al obtener perfil: ${response.statusCode}');
+      throw Exception(_extractError(response, 'Error al obtener perfil'));
     }
   }
 
   Future<void> updatePassword(UpdatePasswordRequest request) async {
     final token = await TokenStorage.getAccessToken();
-    final response = await http.put(
-      ApiConstants.endpoint(baseUrl, 'v1/profile/update-password'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: json.encode(request.toJson()),
-    );
+    final response = await http
+        .put(
+          ApiConstants.endpoint(baseUrl, 'v1/profile/update-password'),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+          body: json.encode(request.toJson()),
+        )
+        .timeout(const Duration(seconds: 15));
 
     if (response.statusCode != 200) {
-      throw Exception('Error al actualizar contraseña: ${response.statusCode}');
+      throw Exception(_extractError(response, 'Error al actualizar contraseña'));
     }
   }
 
   Future<void> updateInformation(UpdateInformationRequest request) async {
     final token = await TokenStorage.getAccessToken();
-    final response = await http.put(
-      ApiConstants.endpoint(baseUrl, 'v1/profile/update-information'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: json.encode(request.toJson()),
-    );
+    final response = await http
+        .put(
+          ApiConstants.endpoint(baseUrl, 'v1/profile/update-information'),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+          body: json.encode(request.toJson()),
+        )
+        .timeout(const Duration(seconds: 15));
 
     if (response.statusCode != 200) {
-      throw Exception('Error al actualizar perfil: ${response.statusCode}');
+      throw Exception(_extractError(response, 'Error al actualizar perfil'));
     }
+  }
+
+  String _extractError(http.Response response, String fallback) {
+    try {
+      final body = json.decode(utf8.decode(response.bodyBytes));
+      if (body is Map<String, dynamic> && body['error'] != null) {
+        return body['error'].toString();
+      }
+    } catch (_) {}
+    return '$fallback (${response.statusCode})';
   }
 }

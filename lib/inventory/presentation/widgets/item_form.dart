@@ -36,6 +36,20 @@ class _ItemFormDialogState extends ConsumerState<ItemFormDialog> {
     'MEDICATIONS',
   ];
 
+  static const Map<String, String> _categoryLabels = {
+    'DENTAL_INSTRUMENTS': 'Instrumental dental',
+    'DISPOSABLE_SUPPLIES': 'Descartables',
+    'CLEANING_AND_DISINFECTION': 'Limpieza y desinfección',
+    'RESTORATIVE_MATERIALS': 'Materiales restauradores',
+    'ORTHODONTIC_SUPPLIES': 'Ortodoncia',
+    'ENDODONTIC_SUPPLIES': 'Endodoncia',
+    'SURGICAL_SUPPLIES': 'Material quirúrgico',
+    'PROTECTIVE_EQUIPMENT': 'Protección personal',
+    'IMAGING_EQUIPMENT': 'Equipos de imagen',
+    'CONSUMABLES': 'Consumibles',
+    'MEDICATIONS': 'Medicamentos',
+  };
+
   @override
   void initState() {
     super.initState();
@@ -58,142 +72,176 @@ class _ItemFormDialogState extends ConsumerState<ItemFormDialog> {
   }
 
   void _submitForm() {
-  if (_formKey.currentState!.validate()) {
-    if (_category == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a category')),
+    if (_formKey.currentState!.validate()) {
+      if (_category == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Selecciona una categoría')),
+        );
+        return;
+      }
+
+      final parsedPrice =
+          double.tryParse(_priceController.text.trim().replaceAll(',', '.')) ??
+              0.0;
+      final request = ItemRequest(
+        name: _nameController.text.trim(),
+        stockQuantity: int.tryParse(_quantityController.text.trim()) ?? 0,
+        price: parsedPrice,
+        category: _category!,
+        isActive: true,
       );
-      return;
-    }
 
-    print('name: ${_nameController.text}');
-    print('quantity: ${_quantityController.text}');
-    print('price: ${_priceController.text}');
-    print('category: $_category');
-
-    final request = ItemRequest(
-      name: _nameController.text.trim(),
-      stockQuantity: int.tryParse(_quantityController.text.trim()) ?? 0,
-      price: double.tryParse(_priceController.text.trim()) ?? 0.0,
-      category: _category!,
-      isActive: true,
-    );
-
-    print('request toJson: ${request.toJson()}');
-
-    if (_isEditing) {
-      Navigator.pop(context, {'id': widget.initialItem!.id, 'edit': request});
-    } else {
-      Navigator.pop(context, {'new': request});
+      if (_isEditing) {
+        Navigator.pop(context, {'id': widget.initialItem!.id, 'edit': request});
+      } else {
+        Navigator.pop(context, {'new': request});
+      }
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      backgroundColor: AppColors.background, // Fondo como las tarjetas
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _isEditing ? 'Edit Item' : 'New Item',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildTextField('Name', _nameController),
-              _buildTextField('Quantity', _quantityController, isNumber: true),
-              _buildTextField('Price', _priceController, isDecimal: true),
-              _buildDropdown(),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.grey[800],
-                    ),
-                    child: const Text('Cancel'),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: _submitForm,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: AppColors.surface,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 460),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.mint,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.inventory_2_outlined,
+                        color: AppColors.primary,
                       ),
                     ),
-                    child: Text(_isEditing ? 'Save' : 'Register'),
-                  ),
-                ],
-              ),
-            ],
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _isEditing ? 'Editar insumo' : 'Nuevo insumo',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.ink,
+                            ),
+                          ),
+                          const Text(
+                            'Completa los datos de stock y costo unitario',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.muted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                _buildTextField('Nombre del insumo *', _nameController),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildTextField(
+                        'Cantidad en stock *',
+                        _quantityController,
+                        isNumber: true,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildTextField(
+                        'Precio unitario (S/) *',
+                        _priceController,
+                        isDecimal: true,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _buildDropdown(),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancelar'),
+                    ),
+                    const SizedBox(width: 10),
+                    FilledButton(
+                      onPressed: _submitForm,
+                      child: Text(_isEditing ? 'Guardar' : 'Registrar'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller,
-      {bool isNumber = false, bool isDecimal = false}) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: isNumber
-            ? TextInputType.number
-            : isDecimal
-                ? const TextInputType.numberWithOptions(decimal: true)
-                : TextInputType.text,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          filled: true,
-          fillColor: Colors.white,
-        ),
-        validator: (value) {
-          if (value == null || value.isEmpty) return 'Required';
-          if ((isNumber || isDecimal) && double.tryParse(value) == null) {
-            return 'Invalid number';
-          }
-          return null;
-        },
-      ),
+  Widget _buildTextField(
+    String label,
+    TextEditingController controller, {
+    bool isNumber = false,
+    bool isDecimal = false,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: isNumber
+          ? TextInputType.number
+          : isDecimal
+              ? const TextInputType.numberWithOptions(decimal: true)
+              : TextInputType.text,
+      decoration: InputDecoration(labelText: label),
+      validator: (value) {
+        final raw = (value ?? '').trim();
+        if (raw.isEmpty) return 'Campo obligatorio';
+        if (isNumber) {
+          final parsed = int.tryParse(raw);
+          if (parsed == null || parsed < 0) return 'Número inválido';
+        } else if (isDecimal) {
+          final parsed = double.tryParse(raw.replaceAll(',', '.'));
+          if (parsed == null || parsed < 0) return 'Monto inválido';
+        }
+        return null;
+      },
     );
   }
 
   Widget _buildDropdown() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: DropdownButtonFormField<String>(
-        value: _category,
-        isExpanded: true,
-        decoration: InputDecoration(
-          labelText: 'Category',
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          filled: true,
-          fillColor: Colors.white,
-        ),
-        hint: const Text("Select a category"),
-        items: _categories.map((cat) {
-          return DropdownMenuItem(value: cat, child: Text(cat));
-        }).toList(),
-        onChanged: (value) => setState(() => _category = value),
-        validator: (value) => value == null ? 'Required' : null,
-      ),
+    return DropdownButtonFormField<String>(
+      initialValue: _category,
+      isExpanded: true,
+      decoration: const InputDecoration(labelText: 'Categoría *'),
+      hint: const Text('Selecciona una categoría'),
+      items: _categories.map((cat) {
+        return DropdownMenuItem(
+          value: cat,
+          child: Text(_categoryLabels[cat] ?? cat),
+        );
+      }).toList(),
+      onChanged: (value) => setState(() => _category = value),
+      validator: (value) => value == null ? 'Campo obligatorio' : null,
     );
   }
 }

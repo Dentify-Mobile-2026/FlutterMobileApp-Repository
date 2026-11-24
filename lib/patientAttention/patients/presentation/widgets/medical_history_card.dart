@@ -14,87 +14,99 @@ class MedicalHistoryCard extends ConsumerWidget {
         medicalHistory.appointmentDate ?? medicalHistory.createdAt);
     final formatted = DateFormat('dd/MM/yyyy').format(date);
     final formattedHour = DateFormat.Hm().format(date);
+    final fromAppointment = medicalHistory.sourceAppointmentId != null;
 
     return Card(
-      color: Colors.white,
-      elevation: 1,
+      color: AppColors.surface,
+      elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: AppColors.border),
       ),
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.mint,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.all(8),
-                      child: const Icon(
-                        Icons.note_add,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          formatted,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                        Text(
-                          '${medicalHistory.sourceAppointmentId == null ? 'Registrado' : 'Cita atendida'}: $formattedHour',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    )),
-                  ],
+                Container(
+                  decoration: BoxDecoration(
+                    color: fromAppointment ? AppColors.infoLight : AppColors.mint,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.all(10),
+                  child: Icon(
+                    fromAppointment
+                        ? Icons.event_available_outlined
+                        : Icons.medical_information_outlined,
+                    size: 20,
+                    color: fromAppointment ? AppColors.info : AppColors.primary,
+                  ),
                 ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8),
+                const SizedBox(width: 12),
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      InfoRow(
-                        label: 'Diagnóstico:',
-                        value: medicalHistory.diagnosis,
+                      Text(
+                        formatted,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                          color: AppColors.ink,
+                        ),
                       ),
-                      InfoRow(
-                        label: 'Descripción:',
-                        value: medicalHistory.description,
-                      ),
-                      InfoRow(
-                        label: 'Evolución:',
-                        value: medicalHistory.record,
-                      ),
-                      InfoRow(
-                        label: 'Medicación:',
-                        value: medicalHistory.medication,
+                      const SizedBox(height: 2),
+                      Text(
+                        '${fromAppointment ? 'Cita atendida' : 'Registro manual'} · $formattedHour',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.muted,
+                        ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: fromAppointment ? AppColors.infoLight : AppColors.mint,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    fromAppointment ? 'Automático' : 'Manual',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color:
+                          fromAppointment ? AppColors.info : AppColors.primary,
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
-        ],
+            const Divider(height: 22),
+            InfoRow(
+              label: 'Diagnóstico',
+              value: medicalHistory.diagnosis,
+            ),
+            InfoRow(
+              label: 'Descripción',
+              value: medicalHistory.description,
+            ),
+            InfoRow(
+              label: 'Evolución',
+              value: medicalHistory.record,
+            ),
+            InfoRow(
+              label: 'Medicación',
+              value: medicalHistory.medication,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -113,18 +125,24 @@ class InfoRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: AppColors.ink,
+          SizedBox(
+            width: 108,
+            child: Text(
+              '$label:',
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+                color: AppColors.muted,
+              ),
             ),
           ),
-          const SizedBox(width: 6),
           Expanded(
             child: Text(
-              value,
-              style: const TextStyle(color: AppColors.ink),
+              value.isEmpty ? '—' : value,
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.ink,
+              ),
             ),
           ),
         ],

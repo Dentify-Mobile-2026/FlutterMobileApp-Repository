@@ -27,14 +27,12 @@ class DashboardViewModel extends StateNotifier<AsyncValue<DashboardData>> {
   }
 
   Future<void> loadDashboardData() async {
-  try {
-    final data = await _useCase();
-    state = AsyncValue.data(data);
-  } catch (e, st) {
-    print("❌ Error en loadDashboardData: $e");
-    print("🧾 Stacktrace: $st");
-    state = AsyncValue.error(e, st);
+    try {
+      final data = await _useCase();
+      state = AsyncValue.data(data);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
   }
-}
 
 }

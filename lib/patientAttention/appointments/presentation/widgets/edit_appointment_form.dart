@@ -70,149 +70,176 @@ class _EditAppointmentFormState extends State<EditAppointmentForm> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: AppColors.background,
+    final dateText =
+        '${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}';
+    final timeText =
+        selectedTime != null ? selectedTime!.format(context) : 'Seleccionar';
+
+    return Dialog(
+      backgroundColor: AppColors.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: const Text(
-        "Edit Appointment",
-        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
-      ),
-      content: Form(
-        key: _formKey,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 460),
         child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton.icon(
-                onPressed: _pickDate,
-                icon: const Icon(Icons.calendar_today),
-                label: const Text("Pick date"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.mint,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.edit_calendar_outlined,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Reprogramar cita',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.ink,
+                            ),
+                          ),
+                          Text(
+                            'Ajusta fecha, hora, motivo o duración',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.muted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: _pickDate,
+                        borderRadius: BorderRadius.circular(10),
+                        child: InputDecorator(
+                          decoration: const InputDecoration(
+                            labelText: 'Fecha *',
+                            prefixIcon: Icon(Icons.calendar_today_outlined, size: 18),
+                          ),
+                          child: Text(
+                            dateText,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.ink,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: InkWell(
+                        onTap: _pickTime,
+                        borderRadius: BorderRadius.circular(10),
+                        child: InputDecorator(
+                          decoration: const InputDecoration(
+                            labelText: 'Hora *',
+                            prefixIcon: Icon(Icons.access_time_outlined, size: 18),
+                          ),
+                          child: Text(
+                            timeText,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.ink,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                TextFormField(
+                  initialValue: reason,
+                  decoration: const InputDecoration(
+                    labelText: 'Motivo de consulta *',
+                    prefixIcon: Icon(Icons.medical_information_outlined),
                   ),
+                  onChanged: (value) => reason = value,
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Campo obligatorio' : null,
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "Date: ${selectedDate.toLocal().toString().split(' ')[0]}",
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: AppColors.primary,
-                ),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton.icon(
-                onPressed: _pickTime,
-                icon: const Icon(Icons.access_time),
-                label: const Text("Pick time"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                const SizedBox(height: 14),
+                TextFormField(
+                  initialValue: duration,
+                  decoration: const InputDecoration(
+                    labelText: 'Duración estimada (minutos) *',
+                    prefixIcon: Icon(Icons.timer_outlined),
                   ),
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) => duration = value,
+                  validator: (v) {
+                    final minutes = int.tryParse(v ?? '');
+                    if (minutes == null || minutes <= 0) {
+                      return 'Ingresa minutos válidos';
+                    }
+                    return null;
+                  },
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                selectedTime != null
-                    ? "Time: ${selectedTime!.format(context)}"
-                    : "No time selected",
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: AppColors.primary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                initialValue: reason,
-                decoration: _inputDecoration("Reason"),
-                onChanged: (value) => reason = value,
-                validator: (v) => v == null || v.isEmpty ? "Required" : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                initialValue: duration,
-                decoration: _inputDecoration("Duration (minutes)"),
-                keyboardType: TextInputType.number,
-                onChanged: (value) => duration = value,
-                validator: (v) {
-                  final minutes = int.tryParse(v ?? '');
-                  if (minutes == null || minutes <= 0) {
-                    return "Enter valid minutes";
-                  }
-                  return null;
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-      actionsPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.grey[800],
-            textStyle: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          child: const Text("Cancel"),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            if (_formKey.currentState!.validate() && selectedTime != null) {
-              final dt = DateTime(
-                selectedDate.year,
-                selectedDate.month,
-                selectedDate.day,
-                selectedTime!.hour,
-                selectedTime!.minute,
-              );
-              final fullDateTime =
-                  '${dt.year.toString().padLeft(4, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}T${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:00';
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancelar'),
+                    ),
+                    const SizedBox(width: 10),
+                    FilledButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate() &&
+                            selectedTime != null) {
+                          final dt = DateTime(
+                            selectedDate.year,
+                            selectedDate.month,
+                            selectedDate.day,
+                            selectedTime!.hour,
+                            selectedTime!.minute,
+                          );
+                          final fullDateTime =
+                              '${dt.year.toString().padLeft(4, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}T${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:00';
 
-              final req = UpdateAppointmentRequest(
-                appointmentDate: fullDateTime,
-                reason: reason,
-                duration: formatDurationFromMinutes(duration),
-              );
-              Navigator.pop<Map<String, dynamic>>(context, {
-                'id': widget.appointment.id,
-                'update': req,
-              });
-            }
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+                          final req = UpdateAppointmentRequest(
+                            appointmentDate: fullDateTime,
+                            reason: reason.trim(),
+                            duration: formatDurationFromMinutes(duration),
+                          );
+                          Navigator.pop<Map<String, dynamic>>(context, {
+                            'id': widget.appointment.id,
+                            'update': req,
+                          });
+                        }
+                      },
+                      child: const Text('Guardar cambios'),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           ),
-          child: const Text("Save"),
         ),
-      ],
-    );
-  }
-
-  InputDecoration _inputDecoration(String label) {
-    return InputDecoration(
-      labelText: label,
-      filled: true,
-      fillColor: Colors.white,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: AppColors.primary),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
       ),
     );
   }

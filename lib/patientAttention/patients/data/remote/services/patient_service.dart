@@ -14,82 +14,96 @@ class PatientService {
   Future<List<PatientResponse>> getAllPatients() async {
     final token = await TokenStorage.getAccessToken();
 
-    final response = await http.get(
-      ApiConstants.endpoint(baseUrl, 'v1/patients'),
-      headers: {
-        'Content-Type': 'application/json',
-        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
-      },
-    );
+    final response = await http
+        .get(
+          ApiConstants.endpoint(baseUrl, 'v1/patients'),
+          headers: {
+            'Content-Type': 'application/json',
+            if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+          },
+        )
+        .timeout(const Duration(seconds: 15));
 
     if (response.statusCode == 200) {
-      print("BODY: ${response.body}");
-      final List<dynamic> jsonResponse = json.decode(response.body);
+      final List<dynamic> jsonResponse =
+          json.decode(utf8.decode(response.bodyBytes));
       return jsonResponse
           .map((patient) => PatientResponse.fromJson(patient))
           .toList();
+    } else if (response.statusCode == 404) {
+      return [];
     } else {
-      print("STATUS: ${response.statusCode}");
-      print("BODY: ${response.body}");
-      throw Exception('Failed to load patients');
+      throw Exception('Error al cargar pacientes (${response.statusCode})');
     }
   }
 
   Future<void> createPatient(AddPatientRequest request) async {
     final token = await TokenStorage.getAccessToken();
 
-    final response = await http.post(
-      ApiConstants.endpoint(baseUrl, 'v1/patients'),
-      headers: {
-        'Content-Type': 'application/json',
-        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
-      },
-      body: json.encode(request.toJson()),
-    );
+    final response = await http
+        .post(
+          ApiConstants.endpoint(baseUrl, 'v1/patients'),
+          headers: {
+            'Content-Type': 'application/json',
+            if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+          },
+          body: json.encode(request.toJson()),
+        )
+        .timeout(const Duration(seconds: 15));
 
     if (response.statusCode != 201) {
-      try {
-        final Map<String, dynamic> errorBody = json.decode(response.body);
-        if (errorBody.containsKey('error')) {
-          throw Exception(errorBody['error']);
-        }
-      } catch (e) {
-        if (e is Exception && !e.toString().contains('FormatException')) rethrow;
-      }
-      throw Exception('Failed to create patient (status ${response.statusCode})');
+      _throwResponseError(response, 'Error al registrar paciente');
     }
   }
 
   Future<void> deletePatient(int id) async {
     final token = await TokenStorage.getAccessToken();
 
-    final response = await http.delete(
-      ApiConstants.endpoint(baseUrl, 'v1/patients/$id'),
-      headers: {
-        'Content-Type': 'application/json',
-        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
-      },
-    );
+    final response = await http
+        .delete(
+          ApiConstants.endpoint(baseUrl, 'v1/patients/$id'),
+          headers: {
+            'Content-Type': 'application/json',
+            if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+          },
+        )
+        .timeout(const Duration(seconds: 15));
 
     if (response.statusCode != 204) {
-      throw Exception('Failed to delete patient');
+      _throwResponseError(response, 'No se pudo eliminar el paciente');
     }
   }
 
   Future<void> updatePatient(int id, UpdatePatientRequest request) async {
     final token = await TokenStorage.getAccessToken();
 
-    final response = await http.put(
-      ApiConstants.endpoint(baseUrl, 'v1/patients/$id'),
-      headers: {
-        'Content-Type': 'application/json',
-        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
-      },
-      body: json.encode(request.toJson()),
-    );
+    final response = await http
+        .put(
+          ApiConstants.endpoint(baseUrl, 'v1/patients/$id'),
+          headers: {
+            'Content-Type': 'application/json',
+            if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+          },
+          body: json.encode(request.toJson()),
+        )
+        .timeout(const Duration(seconds: 15));
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to update patient');
+      _throwResponseError(response, 'No se pudo actualizar el paciente');
     }
+  }
+
+  Never _throwResponseError(http.Response response, String fallback) {
+    try {
+      final decoded = json.decode(utf8.decode(response.bodyBytes));
+      if (decoded is Map<String, dynamic> && decoded['error'] != null) {
+        throw Exception(decoded['error'].toString());
+      }
+    } catch (e) {
+      if (e is Exception && !e.toString().contains('FormatException')) {
+        rethrow;
+      }
+    }
+    throw Exception('$fallback (${response.statusCode})');
   }
 }
