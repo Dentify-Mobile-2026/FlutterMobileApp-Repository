@@ -7,8 +7,9 @@ import 'package:http/http.dart' as http;
 
 class MedicalHistoryService {
   final String baseUrl;
+  final http.Client? _client;
 
-  MedicalHistoryService(this.baseUrl);
+  MedicalHistoryService(this.baseUrl, {http.Client? client}) : _client = client;
 
   Future<List<MedicalHistoryResponse>> getAllMedicalHistories(int id) async {
     final token = await TokenStorage.getAccessToken();
@@ -58,5 +59,36 @@ class MedicalHistoryService {
     if (response.statusCode != 201) {
       throw Exception('Error al guardar evolución clínica');
     }
+  }
+
+  /// Anula una entrada con un motivo obligatorio (US18). La entrada no se borra.
+  Future<MedicalHistoryResponse> annulMedicalHistory(
+    int patientId,
+    int medicalHistoryId,
+    String reason,
+  ) async {
+    final token = await TokenStorage.getAccessToken();
+    final patch = _client?.patch ?? http.patch;
+
+    final response = await patch(
+      ApiConstants.endpoint(baseUrl,
+          'v1/patients/$patientId/medical-histories/$medicalHistoryId/annul'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+      },
+      body: json.encode({'reason': reason}),
+    ).timeout(const Duration(seconds: 15));
+
+    final body = utf8.decode(response.bodyBytes);
+    if (response.statusCode == 200) {
+      return MedicalHistoryResponse.fromJson(json.decode(body));
+    }
+    String message = 'No se pudo anular la entrada (${response.statusCode})';
+    try {
+      final decoded = json.decode(body);
+      if (decoded is Map && decoded['error'] is String) message = decoded['error'];
+    } catch (_) {}
+    throw Exception(message);
   }
 }

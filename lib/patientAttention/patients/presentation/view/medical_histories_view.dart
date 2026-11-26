@@ -25,6 +25,21 @@ class MedicalHistoriesView extends ConsumerWidget {
     }
   }
 
+  Future<void> _annul(
+      BuildContext context, WidgetRef ref, int historyId) async {
+    final reason = await showDialog<String>(
+        context: context, builder: (_) => const AnnulMedicalHistoryDialog());
+    if (reason == null || reason.trim().isEmpty || !context.mounted) return;
+    final model =
+        ref.read(medicalHistoriesViewModelProvider(patient.id).notifier);
+    final error =
+        await model.annulMedicalHistory(patient.id, historyId, reason.trim());
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content:
+            Text(error ?? 'Entrada anulada. Sigue visible en el historial.')));
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = medicalHistoriesViewModelProvider(patient.id);
@@ -90,7 +105,9 @@ class MedicalHistoriesView extends ConsumerWidget {
                                       const EdgeInsets.fromLTRB(8, 0, 8, 24),
                                   itemCount: histories.length,
                                   itemBuilder: (_, index) => MedicalHistoryCard(
-                                      medicalHistory: histories[index])))),
+                                      medicalHistory: histories[index],
+                                      onAnnul: () => _annul(context, ref,
+                                          histories[index].id))))),
         ]),
       )),
     );

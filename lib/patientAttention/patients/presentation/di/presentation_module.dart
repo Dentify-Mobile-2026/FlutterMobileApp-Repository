@@ -3,6 +3,7 @@ import 'package:dentify_flutter/patientAttention/patients/domain/model/medical_h
 import 'package:dentify_flutter/patientAttention/patients/domain/model/patient.dart';
 import 'package:dentify_flutter/patientAttention/patients/domain/usecases/add_medical_history_use_case.dart';
 import 'package:dentify_flutter/patientAttention/patients/domain/usecases/add_patient_use_case.dart';
+import 'package:dentify_flutter/patientAttention/patients/domain/usecases/annul_medical_history_use_case.dart';
 import 'package:dentify_flutter/patientAttention/patients/domain/usecases/delete_patient_use_case.dart';
 import 'package:dentify_flutter/patientAttention/patients/domain/usecases/get_all_medical_histories_use_case.dart';
 import 'package:dentify_flutter/patientAttention/patients/domain/usecases/get_all_patients_use_case.dart';
@@ -70,12 +71,18 @@ final addMedicalHistoryUseCaseProvider =
   return AddMedicalHistoryUseCase(ref.read(medicalHistoryRepositoryProvider));
 });
 
+final annulMedicalHistoryUseCaseProvider =
+    Provider<AnnulMedicalHistoryUseCase>((ref) {
+  return AnnulMedicalHistoryUseCase(ref.read(medicalHistoryRepositoryProvider));
+});
+
 final medicalHistoriesViewModelProvider = StateNotifierProvider.autoDispose
     .family<MedicalHistoryViewModel, List<MedicalHistory>, int>((ref, id) {
   return MedicalHistoryViewModel(
     ref.read(getAllMedicalHistoriesUseCaseProvider),
     ref.read(addMedicalHistoryUseCaseProvider),
     id,
+    annulMedicalHistoryUseCase: ref.read(annulMedicalHistoryUseCaseProvider),
   );
 });
 

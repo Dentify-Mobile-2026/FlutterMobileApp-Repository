@@ -7,6 +7,9 @@ class MedicalHistory {
   final String createdAt;
   final String? appointmentDate;
   final int? sourceAppointmentId;
+  final bool annulled;
+  final String? annulmentReason;
+  final String? annulledAt;
 
   const MedicalHistory({
     required this.id,
@@ -17,5 +20,8 @@ class MedicalHistory {
     required this.createdAt,
     this.appointmentDate,
     this.sourceAppointmentId,
+    this.annulled = false,
+    this.annulmentReason,
+    this.annulledAt,
   });
 }

@@ -149,6 +149,12 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                               icon: const Icon(Icons.lock_outline, size: 18),
                               label: const Text('Cambiar Contraseña'),
                             ),
+                            OutlinedButton.icon(
+                              onPressed: () => Navigator.pushNamed(
+                                  context, 'business-hours'),
+                              icon: const Icon(Icons.schedule_outlined, size: 18),
+                              label: const Text('Horario de atención'),
+                            ),
                           ],
                         ),
                       ],

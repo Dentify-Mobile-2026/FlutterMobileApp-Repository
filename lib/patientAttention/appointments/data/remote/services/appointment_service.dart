@@ -68,7 +68,8 @@ class AppointmentService {
     );
 
     if (response.statusCode == 409) {
-      throw const AppointmentConflictException();
+      throw AppointmentConflictException.fromResponseBody(
+          utf8.decode(response.bodyBytes));
     }
     if (response.statusCode != 201) {
       throw Exception('Failed to create appointment');
@@ -91,7 +92,8 @@ class AppointmentService {
     );
 
     if (response.statusCode == 409) {
-      throw const AppointmentConflictException();
+      throw AppointmentConflictException.fromResponseBody(
+          utf8.decode(response.bodyBytes));
     }
     if (response.statusCode != 200) {
       throw Exception('Failed to update appointment');
