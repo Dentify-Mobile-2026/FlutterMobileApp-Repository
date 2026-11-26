@@ -102,6 +102,11 @@ class _AppointmentStatusDialogState extends State<AppointmentStatusDialog> {
                   spacing: 8,
                   runSpacing: 8,
                   children: AppointmentStatus.values.where((st) {
+                    // US43: una cita atendida solo puede guardar de nuevo su evolución.
+                    if (widget.appointment.isAttended &&
+                        st != AppointmentStatus.completed) {
+                      return false;
+                    }
                     // "En Atención" ocurre automáticamente en su horario; no permitir forzarla antes de la hora.
                     if (st == AppointmentStatus.inProgress &&
                         widget.appointment.isFuture) {
