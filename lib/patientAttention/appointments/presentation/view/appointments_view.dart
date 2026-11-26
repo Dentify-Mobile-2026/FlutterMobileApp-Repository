@@ -453,29 +453,32 @@ class _AppointmentsViewState extends ConsumerState<AppointmentsView>
                   child:
                       const Text('Evolución', style: TextStyle(fontSize: 12)),
                 ),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    foregroundColor: AppColors.muted,
-                    visualDensity: VisualDensity.compact,
+                // US05 y US07: una cita que ya empezó no se reprograma ni se elimina.
+                if (appt.canBeRescheduledOrDeleted) ...[
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.muted,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(sheetContext);
+                      _onEdit(parentContext, appt);
+                    },
+                    child: const Text('Reprogramar',
+                        style: TextStyle(fontSize: 12)),
                   ),
-                  onPressed: () {
-                    Navigator.pop(sheetContext);
-                    _onEdit(parentContext, appt);
-                  },
-                  child:
-                      const Text('Reprogramar', style: TextStyle(fontSize: 12)),
-                ),
-                IconButton(
-                  tooltip: 'Eliminar cita',
-                  visualDensity: VisualDensity.compact,
-                  iconSize: 17,
-                  icon:
-                      const Icon(Icons.delete_outline, color: AppColors.muted),
-                  onPressed: () {
-                    Navigator.pop(sheetContext);
-                    _onDelete(parentContext, appt);
-                  },
-                ),
+                  IconButton(
+                    tooltip: 'Eliminar cita',
+                    visualDensity: VisualDensity.compact,
+                    iconSize: 17,
+                    icon: const Icon(Icons.delete_outline,
+                        color: AppColors.muted),
+                    onPressed: () {
+                      Navigator.pop(sheetContext);
+                      _onDelete(parentContext, appt);
+                    },
+                  ),
+                ],
               ],
             ),
           ),

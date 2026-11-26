@@ -46,6 +46,15 @@ class Appointment {
     }
   }
 
+  /// US05 y US07: solo una cita que todavía no empieza se puede reprogramar o eliminar.
+  bool get canBeRescheduledOrDeleted => isFuture;
+
+  /// US43: una cita atendida ya no vuelve a otro estado. Igual que el servicio,
+  /// basta con la marca de atendida o con el estado COMPLETED.
+  bool get isAttended =>
+      completed ||
+      AppointmentStatus.fromCode(status) == AppointmentStatus.completed;
+
   /// Indica si la hora programada aún no llega (no se puede iniciar antes para no desfasar la agenda).
   bool get isFuture {
     final start = startDateTime;
