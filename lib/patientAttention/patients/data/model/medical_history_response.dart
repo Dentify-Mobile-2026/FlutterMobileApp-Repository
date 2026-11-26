@@ -9,6 +9,9 @@ class MedicalHistoryResponse {
   final String createdAt;
   final String? appointmentDate;
   final int? sourceAppointmentId;
+  final bool annulled;
+  final String? annulmentReason;
+  final String? annulledAt;
 
   const MedicalHistoryResponse({
     required this.id,
@@ -19,6 +22,9 @@ class MedicalHistoryResponse {
     required this.createdAt,
     this.appointmentDate,
     this.sourceAppointmentId,
+    this.annulled = false,
+    this.annulmentReason,
+    this.annulledAt,
   });
 
   factory MedicalHistoryResponse.fromJson(Map<String, dynamic> json) {
@@ -30,7 +36,11 @@ class MedicalHistoryResponse {
         medication: json['medication'],
         createdAt: json['createdAt'],
         appointmentDate: json['appointmentDate'],
-        sourceAppointmentId: json['sourceAppointmentId']);
+        sourceAppointmentId: json['sourceAppointmentId'],
+        // Las entradas anteriores a la anulación no traen el campo: cuentan como vigentes.
+        annulled: json['annulled'] == true,
+        annulmentReason: json['annulmentReason'],
+        annulledAt: json['annulledAt']);
   }
 
   MedicalHistory toDomain() {
@@ -42,6 +52,9 @@ class MedicalHistoryResponse {
         medication: medication,
         createdAt: createdAt,
         appointmentDate: appointmentDate,
-        sourceAppointmentId: sourceAppointmentId);
+        sourceAppointmentId: sourceAppointmentId,
+        annulled: annulled,
+        annulmentReason: annulmentReason,
+        annulledAt: annulledAt);
   }
 }

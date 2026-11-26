@@ -4,4 +4,5 @@ import 'package:dentify_flutter/patientAttention/patients/domain/model/medical_h
 abstract class MedicalHistoryRepository {
   Future<List<MedicalHistory>> getMedicalHistories(int id);
   Future<void> createMedicalHistory(AddMedicalHistoryRequest medicalHistory, int id);
+  Future<MedicalHistory> annulMedicalHistory(int patientId, int medicalHistoryId, String reason);
 }

@@ -18,4 +18,10 @@ class MedicalHistoryRepositoryImpl implements MedicalHistoryRepository{
   Future<void> createMedicalHistory(AddMedicalHistoryRequest medicalHistory, int id) async {
     await medicalHistoryService.createMedicalHistory(medicalHistory, id);
   }
-} 
+
+  @override
+  Future<MedicalHistory> annulMedicalHistory(int patientId, int medicalHistoryId, String reason) async {
+    final response = await medicalHistoryService.annulMedicalHistory(patientId, medicalHistoryId, reason);
+    return response.toDomain();
+  }
+}
